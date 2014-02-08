@@ -8,13 +8,25 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="ru.eternalkaif.soundsofnature.MainActivity"
+            android:name="ru.eternalkaif.soundsofnature.activities.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="ru.eternalkaif.soundsofnature.activities.SettingsActivity"
+            android:label="@string/title_activity_settings" >
+        </activity>
+        <activity
+            android:name="ru.eternalkaif.soundsofnature.activities.PlayerActivity"
+            android:label="@string/title_activity_player"
+            android:parentActivityName="ru.eternalkaif.soundsofnature.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="MainActivity" />
         </activity>
     </application>
 

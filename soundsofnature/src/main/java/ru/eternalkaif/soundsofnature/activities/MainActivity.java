@@ -1,4 +1,4 @@
-package ru.eternalkaif.soundsofnature;
+package ru.eternalkaif.soundsofnature.activities;
 
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import ru.eternalkaif.soundsofnature.R;
 
 public class MainActivity extends ActionBarActivity implements ActionBar.OnNavigationListener {
 
