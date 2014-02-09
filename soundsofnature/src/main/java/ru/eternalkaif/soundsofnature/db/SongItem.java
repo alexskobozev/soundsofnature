@@ -7,18 +7,19 @@ public class SongItem {
     private String songUrl;
     private String jpgUrl;
 
-    public SongItem(int _id, String name, String songUrl, String jpgUrl) {
+    public SongItem(int _id, String name, String songUrl, String jpgUrl, int isDownloaded) {
         this._id = _id;
         this.name = name;
         this.songUrl = songUrl;
         this.jpgUrl = jpgUrl;
+        this.isDownloaded = isDownloaded;
     }
 
-    public boolean isDownloaded() {
+    public int isDownloaded() {
         return isDownloaded;
     }
 
-    public void setDownloaded(boolean isDownloaded) {
+    public void setDownloaded(int isDownloaded) {
         this.isDownloaded = isDownloaded;
     }
 
@@ -54,7 +55,7 @@ public class SongItem {
         this._id = _id;
     }
 
-    private boolean isDownloaded;
+    private int isDownloaded;
 
 
 }
