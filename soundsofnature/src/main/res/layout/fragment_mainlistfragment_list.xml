@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ru.eternalkaif.soundsofnature.fragments.MainListFragmentFragment">
+    tools:context="ru.eternalkaif.soundsofnature.fragments.MainListFragment">
 
     <ListView
         android:id="@android:id/list"
@@ -12,6 +12,7 @@
 
     <TextView
         android:id="@android:id/empty"
+        android:text="Fragment All"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center" />

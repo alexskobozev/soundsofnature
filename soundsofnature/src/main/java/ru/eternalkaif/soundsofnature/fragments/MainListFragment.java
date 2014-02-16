@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
+import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
 /**
  * A fragment representing a list of Items.
@@ -24,7 +25,7 @@ import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class DownloadedListFragmentFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class MainListFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -49,8 +50,8 @@ public class DownloadedListFragmentFragment extends Fragment implements AbsListV
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static DownloadedListFragmentFragment newInstance(String param1, String param2) {
-        DownloadedListFragmentFragment fragment = new DownloadedListFragmentFragment();
+    public static MainListFragment newInstance(String param1, String param2) {
+        MainListFragment fragment = new MainListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -62,7 +63,7 @@ public class DownloadedListFragmentFragment extends Fragment implements AbsListV
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public DownloadedListFragmentFragment() {
+    public MainListFragment() {
     }
 
     @Override
@@ -82,7 +83,7 @@ public class DownloadedListFragmentFragment extends Fragment implements AbsListV
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_downloadedlistfragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_mainlistfragment, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -134,19 +135,5 @@ public class DownloadedListFragmentFragment extends Fragment implements AbsListV
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
-    }
 
 }
