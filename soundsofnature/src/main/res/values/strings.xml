@@ -8,5 +8,6 @@
     <string name="title_activity_player">PlayerActivity</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_reload">Reload</string>
+    <string name="json_url">http://put_url.com/songlist.json</string>
 
 </resources>
