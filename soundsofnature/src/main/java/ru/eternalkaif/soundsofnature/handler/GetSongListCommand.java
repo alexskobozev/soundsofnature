@@ -7,7 +7,7 @@ import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.util.Log;
 
-public class DownloadSongCommand extends BaseCommand {
+public class GetSongListCommand extends BaseCommand {
 
     public static final Parcelable.Creator<DownloadSongCommand> CREATOR = new Parcelable.Creator<DownloadSongCommand>() {
         public DownloadSongCommand createFromParcel(Parcel in) {
@@ -20,14 +20,12 @@ public class DownloadSongCommand extends BaseCommand {
         }
     };
     private static final String TAG = "TestActionCommand";
-    private String url;
 
-    public DownloadSongCommand(String url) {
-        this.url = url;
+    public GetSongListCommand() {
     }
 
-    protected DownloadSongCommand(Parcel in) {
-        url = in.readString();
+
+    private GetSongListCommand(Parcel in) {
         Log.d("Command", "is runing");
     }
 
@@ -43,8 +41,5 @@ public class DownloadSongCommand extends BaseCommand {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(url);
     }
-
-
 }

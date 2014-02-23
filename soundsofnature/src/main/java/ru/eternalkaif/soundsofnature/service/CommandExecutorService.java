@@ -15,14 +15,12 @@ import ru.eternalkaif.soundsofnature.handler.BaseCommand;
 
 public class CommandExecutorService extends Service {
 
-    private static final int NUM_TREADS = 4;
-
     public static final String ACTION_EXECUTE_COMMAND = BaseApplication.PACKAGE.concat(".ACTION_EXECUTE_COMMAND");
     public static final String ACTION_CANCEL_COMMAND = BaseApplication.PACKAGE.concat(".ACTION_CANCEL_COMMAND");
     public static final String EXTRA_REQUEST_ID = BaseApplication.PACKAGE.concat(".EXTRA_REQUEST_ID");
     public static final String EXTRA_STATUS_RECEIVER = BaseApplication.PACKAGE.concat(".STATUS_RECEIVER");
     public static final String EXTRA_COMMAND = BaseApplication.PACKAGE.concat(".EXTRA_COMMAND");
-
+    private static final int NUM_TREADS = 4;
     private ExecutorService executor = Executors.newFixedThreadPool(NUM_TREADS);
 
     private SparseArray<RunningCommand> runningCommands = new SparseArray<RunningCommand>();
@@ -48,11 +46,30 @@ public class CommandExecutorService extends Service {
                 runningCommand.cancel();
             }
         }
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private int getCommandId(Intent intent) {
         return intent.getIntExtra(EXTRA_REQUEST_ID, -1);
+    }
+
+    private ResultReceiver getReceiver(Intent intent) {
+        return intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
+    }
+
+    private BaseCommand getCommand(Intent intent) {
+        return intent.getParcelableExtra(EXTRA_COMMAND);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        executor.shutdownNow();
     }
 
     private class RunningCommand implements Runnable {
@@ -85,24 +102,5 @@ public class CommandExecutorService extends Service {
                 }
             }
         }
-    }
-
-    private ResultReceiver getReceiver(Intent intent) {
-        return intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
-    }
-
-    private BaseCommand getCommand(Intent intent) {
-        return intent.getParcelableExtra(EXTRA_COMMAND);
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        executor.shutdownNow();
     }
 }

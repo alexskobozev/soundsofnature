@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import ru.eternalkaif.soundsofnature.handler.BaseCommand;
 import ru.eternalkaif.soundsofnature.handler.DownloadSongCommand;
+import ru.eternalkaif.soundsofnature.handler.GetSongListCommand;
 import ru.eternalkaif.soundsofnature.service.CommandExecutorService;
 
 public class ServiceHelper {
@@ -39,9 +40,15 @@ public class ServiceHelper {
         currentListeners.remove(callbackListener);
     }
 
-    public int loginAction(String mUsername, String mPassword) {
+    public int downloadSongAction(String url) {
         final int requestId = createId();
-        Intent intent = createIntent(application, new DownloadSongCommand(mUsername, mPassword), requestId);
+        Intent intent = createIntent(application, new DownloadSongCommand(url), requestId);
+        return runRequest(requestId, intent);
+    }
+
+    public int getSongListAction() {
+        final int requestId = createId();
+        Intent intent = createIntent(application, new GetSongListCommand(), requestId);
         return runRequest(requestId, intent);
     }
 

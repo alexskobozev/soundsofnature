@@ -3,6 +3,7 @@
     package="ru.eternalkaif.soundsofnature" >
 
     <application
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -23,7 +24,7 @@
         <activity
             android:name="ru.eternalkaif.soundsofnature.activities.PlayerActivity"
             android:label="@string/title_activity_player"
-            android:parentActivityName="ru.eternalkaif.soundsofnature.MainActivity" >
+            android:parentActivityName="ru.eternalkaif.soundsofnature.activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />

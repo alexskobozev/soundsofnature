@@ -7,18 +7,18 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
+import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.fragments.DownloadedListFragment;
 import ru.eternalkaif.soundsofnature.fragments.MainListFragment;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
-public class MainActivity extends ActionBarActivity implements
+public class MainActivity extends BaseActivity implements
         ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>,
         OnFragmentInteractionListener {
 
