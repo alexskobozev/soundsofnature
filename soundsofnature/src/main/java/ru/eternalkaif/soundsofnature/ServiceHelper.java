@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.os.ResultReceiver;
+import android.util.Log;
 import android.util.SparseArray;
 
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ public class ServiceHelper {
     }
 
     public int getSongListAction() {
+        Log.d("TestActionCommand","getsonglistaction in helper");
         final int requestId = createId();
         Intent intent = createIntent(application, new GetSongListCommand(), requestId);
         return runRequest(requestId, intent);
@@ -63,6 +65,7 @@ public class ServiceHelper {
     }
 
     private Intent createIntent(final Context context, BaseCommand command, final int requestId) {
+
         Intent intent = new Intent(context, CommandExecutorService.class);
         intent.setAction(CommandExecutorService.ACTION_EXECUTE_COMMAND);
 

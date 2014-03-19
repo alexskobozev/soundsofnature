@@ -24,7 +24,7 @@ public class JSONParser {
 
     public ArrayList<SongItem> getListOfSongs(String url) {
         final ArrayList<SongItem> songList = new ArrayList<SongItem>();
-        SongsHttpClient.get("songlist.json", null, new JsonHttpResponseHandler() {
+        SongsHttpClient.get("songlist.json.json", null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(JSONObject response) {
                 super.onSuccess(response);

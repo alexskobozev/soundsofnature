@@ -32,6 +32,7 @@ public class CommandExecutorService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
         if (ACTION_EXECUTE_COMMAND.equals(intent.getAction())) {
             RunningCommand runningCommand = new RunningCommand(intent);
 

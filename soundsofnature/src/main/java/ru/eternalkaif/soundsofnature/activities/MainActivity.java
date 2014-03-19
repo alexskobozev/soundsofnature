@@ -5,6 +5,7 @@ import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -14,12 +15,15 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.fragments.DownloadedListFragment;
 import ru.eternalkaif.soundsofnature.fragments.MainListFragment;
+import ru.eternalkaif.soundsofnature.handler.BaseCommand;
+import ru.eternalkaif.soundsofnature.handler.GetSongListCommand;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
 public class MainActivity extends BaseActivity implements
@@ -64,12 +68,59 @@ public class MainActivity extends BaseActivity implements
                         }),
                 this);
 
+       retreiveSongList();
+
+    }
+
+
+    private void retreiveSongList(){
         //TODO:TEST METHOOD
         ProgressDialogFragment progress = new ProgressDialogFragment();
         progress.show(getSupportFragmentManager(), PROGRESS_DIALOG);
 
         requestId = getServiceHelper().getSongListAction();
+    }
 
+
+
+    @Override
+    protected Dialog onCreateDialog(int id) {
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Processing");
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                getServiceHelper().cancelCommand(requestId);
+            }
+        });
+
+        return progressDialog;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (requestId != -1 && !getServiceHelper().isPending(requestId)) {
+            dismissProgressDialog();
+        }
+    }
+
+    @Override
+    public void onServiceCallBack(int requestId, Intent requestIntent, int resultCode, Bundle resultData) {
+        super.onServiceCallBack(requestId, requestIntent, resultCode, resultData);
+
+        if (getServiceHelper().check(requestIntent, GetSongListCommand.class)) {
+            if (resultCode == GetSongListCommand.RESPONSE_SUCCESS) {
+                Toast.makeText(this, resultData.getString("data"), Toast.LENGTH_LONG).show();
+                dismissProgressDialog();
+            } else if (resultCode == GetSongListCommand.RESPONSE_PROGRESS) {
+                upodateProgressDialog(resultData.getInt(BaseCommand.EXTRA_PROGRESS, -1));
+            } else {
+                Toast.makeText(this, resultData.getString("error"), Toast.LENGTH_LONG).show();
+                dismissProgressDialog();
+            }
+        }
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
@@ -102,6 +153,8 @@ public class MainActivity extends BaseActivity implements
                     savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
         }
     }
+
+
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -188,5 +241,21 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onFragmentInteraction(String id) {
 
+    }
+
+    private void dismissProgressDialog() {
+        ProgressDialogFragment progress = (ProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(
+                PROGRESS_DIALOG);
+        if (progress != null) {
+            progress.dismiss();
+        }
+    }
+
+    private void upodateProgressDialog(int progress) {
+        ProgressDialogFragment progressDialog = (ProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(
+                PROGRESS_DIALOG);
+        if (progressDialog != null) {
+            progressDialog.setProgress(progress);
+        }
     }
 }
