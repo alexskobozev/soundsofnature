@@ -1,11 +1,15 @@
 package ru.eternalkaif.soundsofnature.activities;
 
+import android.app.Dialog;
 import android.app.LoaderManager;
+import android.app.ProgressDialog;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +31,11 @@ public class MainActivity extends BaseActivity implements
      * current dropdown position.
      */
     private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+    private static final String PROGRESS_DIALOG = "progress-dialog";
+
+    private int requestId = -1;
+
+
     public static final int LOADER_ID = 0;
     private Uri mDataUrl;
     private String[] mProjection;
@@ -54,6 +63,35 @@ public class MainActivity extends BaseActivity implements
                                 getString(R.string.title_section_downloaded),
                         }),
                 this);
+
+        //TODO:TEST METHOOD
+        ProgressDialogFragment progress = new ProgressDialogFragment();
+        progress.show(getSupportFragmentManager(), PROGRESS_DIALOG);
+
+        requestId = getServiceHelper().getSongListAction();
+
+    }
+
+    public static class ProgressDialogFragment extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Result: 0%");
+
+            return progressDialog;
+        }
+
+        public void setProgress(int progress) {
+            ((ProgressDialog) getDialog()).setMessage("Result: " + progress + "%");
+        }
+
+        @Override
+        public void onCancel(DialogInterface dialog) {
+            super.onCancel(dialog);
+            ((MainActivity) getActivity()).cancelCommand();
+        }
+
     }
 
     @Override
@@ -138,7 +176,9 @@ public class MainActivity extends BaseActivity implements
 
 
     }
-
+    public void cancelCommand() {
+        getServiceHelper().cancelCommand(requestId);
+    }
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);

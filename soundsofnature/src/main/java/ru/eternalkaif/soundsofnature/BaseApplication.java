@@ -5,7 +5,7 @@ import android.content.Context;
 
 public class BaseApplication extends Application {
 
-    public static final String PACKAGE = "com.eternalkaif.wheelytest";
+    public static final String PACKAGE = "ru.eternalkaif.soundsofnature";
 
     private ServiceHelper serviceHelper;
 
