@@ -5,24 +5,20 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ru.eternalkaif.soundsofnature.objects.Sound;
+
+import static ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract.*;
 
 public class SoundsOpenHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
 
     public static final String DATABASE_NAME = "sounds.db";
-
-    public static final String TABLE_SOUNDS_NAME = "sounds";
-
-    private static final String KEY_ID = "_id";
-    private static final String KEY_SONGTITLE = "songtitle";
-    private static final String KEY_SONG_URL = "songurl";
-    private static final String KEY_JPG_URL = "jpgurl";
-    private static final String KEY_IS_DOWNLOADED = "is_downloaded";
-
 
     public SoundsOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,62 +27,70 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_SOUNDS_TABLE = "CREATE TABLE " + TABLE_SOUNDS_NAME + " ("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + KEY_SONGTITLE + " TEXT NOT NULL, "
-                + KEY_SONG_URL + " TEXT, "
-                + KEY_JPG_URL + " TEXT, "
-                + KEY_IS_DOWNLOADED + " INTEGER DEFAULT 0"
+        String CREATE_SOUNDS_TABLE = "CREATE TABLE " + Sounds.TABLE_NAME + " ("
+                + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + Sounds.NamesColoumns.SOUNDTITLE + " TEXT NOT NULL, "
+                + Sounds.NamesColoumns.SOUNDMP3LINK + " TEXT, "
+                + Sounds.NamesColoumns.SOUNDJPGLINK + " TEXT, "
+                + Sounds.NamesColoumns.DOWNLOADED + " INTEGER DEFAULT 0"
                 + ") ";
         db.execSQL(CREATE_SOUNDS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP DATABASE IF EXISTS " + TABLE_SOUNDS_NAME);
+        db.execSQL("DROP DATABASE IF EXISTS " + Sounds.TABLE_NAME);
         onCreate(db);
     }
 
 
-    public void addSong(SongItem item) {
+    public void addSong(Sound item) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(KEY_SONGTITLE, item.getName());
-        contentValues.put(KEY_SONG_URL, item.getSongUrl());
-        contentValues.put(KEY_JPG_URL, item.getJpgUrl());
-        contentValues.put(KEY_IS_DOWNLOADED, item.isDownloaded());
+        contentValues.put(Sounds.NamesColoumns.SOUNDTITLE, item.getSoundtitle());
+        contentValues.put(Sounds.NamesColoumns.SOUNDMP3LINK, item.getSoundmp3link());
+        contentValues.put(Sounds.NamesColoumns.SOUNDJPGLINK, item.getSoundjpglink());
+        contentValues.put(Sounds.NamesColoumns.DOWNLOADED, item.isDownloaded());
 
         if (db != null) {
-            db.insert(TABLE_SOUNDS_NAME, null, contentValues);
+            db.insert(Sounds.TABLE_NAME, null, contentValues);
             db.close();
         }
     }
 
-    public SongItem getSong(int id) {
+    public Sound getSong(int id) {
         SQLiteDatabase db = getReadableDatabase();
 
         if (db != null) {
-            Cursor cursor = db.query(TABLE_SOUNDS_NAME,
-                    new String[]{KEY_ID, KEY_SONGTITLE, KEY_SONG_URL, KEY_JPG_URL, KEY_IS_DOWNLOADED},
-                    KEY_ID + "=?",
+            Cursor cursor = db.query(Sounds.TABLE_NAME,
+                    new String[]{BaseColumns._ID,
+                            Sounds.NamesColoumns.SOUNDTITLE,
+                            Sounds.NamesColoumns.SOUNDMP3LINK,
+                            Sounds.NamesColoumns.SOUNDJPGLINK,
+                            Sounds.NamesColoumns.DOWNLOADED},
+                    BaseColumns._ID + "=?",
                     new String[]{String.valueOf(id)},
-                    null, null, null, null);
+                    null, null, null, null
+            );
             if (cursor != null) {
                 cursor.moveToFirst();
 
-                return new SongItem(Integer.parseInt(cursor.getString(0)),
-                        cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
+                return new Sound(
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getString(3),
+                        cursor.getInt(4));
             }
         }
         return null;
 
     }
 
-    public List<SongItem> getAllSongs() {
+    public List<Sound> getAllSongs() {
 
-        List<SongItem> songItems = new ArrayList<SongItem>();
-        String selectQuery = "SELECT * FROM " + TABLE_SOUNDS_NAME;
+        List<Sound> soundList = new ArrayList<Sound>();
+        String selectQuery = "SELECT * FROM " + Sounds.TABLE_NAME;
 
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor;
@@ -95,18 +99,18 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
 
             if (cursor.moveToFirst()) {
                 do {
-                    SongItem songItem = new SongItem(Integer.parseInt(cursor.getString(0)),
+                    Sound sound = new Sound(
                             cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getInt(4));
-                    songItems.add(songItem);
+                    soundList.add(sound);
                 } while (cursor.moveToNext());
             }
         }
 
-        return songItems;
+        return soundList;
     }
 
     public int getSongsCount() {
-        String songQuery = "SELECT * FROM " + TABLE_SOUNDS_NAME;
+        String songQuery = "SELECT * FROM " + Sounds.TABLE_NAME;
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor;
         if (db != null) {
@@ -118,17 +122,21 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
         return 0;
     }
 
-    public int updateSong(SongItem item) {
+    public int updateSong(Sound sound) {
         return 0;
     }
 
     public void deleteSong(int id) {
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
-            db.delete(TABLE_SOUNDS_NAME, KEY_ID + " =?",
+            db.delete(Sounds.TABLE_NAME, BaseColumns._ID + " =?",
                     new String[]{String.valueOf(id)});
             db.close();
         }
 
+    }
+
+    public void dropTables(SQLiteDatabase db) {
+        db.execSQL("DROP TABLE IF EXISTS " + Sounds.TABLE_NAME);
     }
 }

@@ -180,6 +180,8 @@ public class MainActivity extends BaseActivity implements
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
+        } else if (id == R.id.action_reload){
+            retreiveSongList();
         }
         return super.onOptionsItemSelected(item);
     }

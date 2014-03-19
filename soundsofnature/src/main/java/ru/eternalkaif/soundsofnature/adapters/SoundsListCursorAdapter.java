@@ -9,7 +9,7 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import ru.eternalkaif.soundsofnature.R;
-import ru.eternalkaif.soundsofnature.db.SongsTable;
+import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
 
 public class SoundsListCursorAdapter extends CursorAdapter {
 
@@ -30,6 +30,7 @@ public class SoundsListCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         TextView rowText = (TextView) view.findViewById(R.id.songsText);
-        rowText.setText(cursor.getString(cursor.getColumnIndex(SongsTable.SONG_TITLE)));
+        rowText.setText(cursor.getString(cursor
+                .getColumnIndex(SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE)));
     }
 }
