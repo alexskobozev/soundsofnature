@@ -1,12 +1,10 @@
 {
   "soundlist": [
       {
-          "sound":{
             "soundtitle":"Tropical Rain",
             "soundmp3link":"https://archive.org/download/Sounds_of_Nature_Collection/01_Tropical_Rain.mp3",
             "soundjpglink":""
 
-          }
       }
   ]
 }

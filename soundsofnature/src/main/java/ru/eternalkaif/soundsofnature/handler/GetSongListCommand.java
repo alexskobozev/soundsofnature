@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
+import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.objects.Soundlist;
 
 public class GetSongListCommand extends BaseCommand {
@@ -53,24 +54,24 @@ public class GetSongListCommand extends BaseCommand {
         ObjectMapper objectMapper = new ObjectMapper();
         Soundlist soundlist = null;
 
+
+
         try {
-            is = context.getAssets().open("songlist.json");
+            is = context.getResources().openRawResource(R.raw.songlist);
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
             is.close();
             json = new String(buffer, "UTF-8");
-            soundlist = objectMapper.readValue(json,Soundlist.class);
+            soundlist = objectMapper.readValue(json, Soundlist.class);
             sendProgress(100);
             data.putString("data", soundlist.toString());
             notifySuccess(data);
         } catch (IOException e) {
-            data.putString("error","FUck!");
+            data.putString("error", "IOexception!");
             notifyFailure(data);
             e.printStackTrace();
         }
-
-
 
 
         Log.d(TAG, soundlist != null ? soundlist.toString() : null);

@@ -1,40 +1,40 @@
 package ru.eternalkaif.soundsofnature.objects;
 
 public class Sound {
-    public String soundTitle;
-    public String soundMp3Link;
-    public String soundJpgLink;
+    public String soundtitle;
+    public String soundmp3link;
+    public String soundjpglink;
 
-    public String getSoundTitle() {
-        return soundTitle;
+    public String getSoundtitle() {
+        return soundtitle;
     }
 
-    public void setSoundTitle(String soundTitle) {
-        this.soundTitle = soundTitle;
+    public void setSoundtitle(String soundtitle) {
+        this.soundtitle = soundtitle;
     }
 
-    public String getSoundMp3Link() {
-        return soundMp3Link;
+    public String getSoundmp3link() {
+        return soundmp3link;
     }
 
-    public void setSoundMp3Link(String soundMp3Link) {
-        this.soundMp3Link = soundMp3Link;
+    public void setSoundmp3link(String soundmp3link) {
+        this.soundmp3link = soundmp3link;
     }
 
-    public String getSoundJpgLink() {
-        return soundJpgLink;
+    public String getSoundjpglink() {
+        return soundjpglink;
     }
 
-    public void setSoundJpgLink(String soundJpgLink) {
-        this.soundJpgLink = soundJpgLink;
+    public void setSoundjpglink(String soundjpglink) {
+        this.soundjpglink = soundjpglink;
     }
 
     @Override
     public String toString() {
         return "Sound{" +
-                "soundTitle='" + soundTitle + '\'' +
-                ", soundMp3Link='" + soundMp3Link + '\'' +
-                ", soundJpgLink='" + soundJpgLink + '\'' +
+                "soundtitle='" + soundtitle + '\'' +
+                ", soundmp3link='" + soundmp3link + '\'' +
+                ", soundjpglink='" + soundjpglink + '\'' +
                 '}';
     }
 }

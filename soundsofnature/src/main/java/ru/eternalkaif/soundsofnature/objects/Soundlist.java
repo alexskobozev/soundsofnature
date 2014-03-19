@@ -4,30 +4,30 @@ import java.util.ArrayList;
 
 public class Soundlist {
 
-    public ArrayList<Sound> soundList;
+    public ArrayList<Sound> soundlist;
 
     public Soundlist() {
-        soundList = new ArrayList<Sound>();
+        soundlist = new ArrayList<Sound>();
     }
 
-    public ArrayList<Sound> getSoundList() {
-        return soundList;
+    public ArrayList<Sound> getSoundlist() {
+        return soundlist;
     }
 
-    public void setSoundList(ArrayList<Sound> soundList) {
-        this.soundList = soundList;
+    public void setSoundlist(ArrayList<Sound> soundlist) {
+        this.soundlist = soundlist;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("***SONGLIST***\n");
-        if (soundList.isEmpty()) {
+        if (soundlist.isEmpty()) {
             stringBuilder.append("***NO SONGS***");
         } else {
-            for (int i = 0; i < soundList.size(); i++) {
+            for (int i = 0; i < soundlist.size(); i++) {
                 stringBuilder.append("Song ").append(i).append(": ");
-                stringBuilder.append(soundList.get(i).toString());
+                stringBuilder.append(soundlist.get(i).toString());
                 stringBuilder.append("\n");
             }
         }
