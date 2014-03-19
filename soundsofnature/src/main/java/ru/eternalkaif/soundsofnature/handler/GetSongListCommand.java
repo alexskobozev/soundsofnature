@@ -12,9 +12,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Random;
 
 import ru.eternalkaif.soundsofnature.R;
+import ru.eternalkaif.soundsofnature.db.SoundsOpenHelper;
 import ru.eternalkaif.soundsofnature.objects.Soundlist;
 
 public class GetSongListCommand extends BaseCommand {
@@ -44,16 +44,12 @@ public class GetSongListCommand extends BaseCommand {
 
         Bundle data = new Bundle();
 
-        Random rnd = new Random();
-
         int progress = 0;
         sendProgress(progress);
-        String json = null;
-
-        InputStream is = null;
+        String json;
+        InputStream is;
         ObjectMapper objectMapper = new ObjectMapper();
         Soundlist soundlist = null;
-
 
 
         try {
@@ -64,17 +60,22 @@ public class GetSongListCommand extends BaseCommand {
             is.close();
             json = new String(buffer, "UTF-8");
             soundlist = objectMapper.readValue(json, Soundlist.class);
-            sendProgress(100);
+            sendProgress(50);
+            SoundsOpenHelper soundsOpenHelper = new SoundsOpenHelper(context);
+
+            for (int i = 0; i < soundlist.soundlist.size(); i++) {
+                if (!soundsOpenHelper.ifExistByUrl(soundlist.soundlist.get(i).soundmp3link))
+                    soundsOpenHelper.addSong(soundlist.soundlist.get(i));
+            }
+
             data.putString("data", soundlist.toString());
+            sendProgress(100);
             notifySuccess(data);
         } catch (IOException e) {
             data.putString("error", "IOexception!");
             notifyFailure(data);
             e.printStackTrace();
         }
-
-
-        Log.d(TAG, soundlist != null ? soundlist.toString() : null);
 
 
     }

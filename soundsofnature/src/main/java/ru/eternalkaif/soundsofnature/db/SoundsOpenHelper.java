@@ -59,6 +59,31 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
         }
     }
 
+    public boolean ifExistByUrl(String songUrl) {
+
+        SQLiteDatabase db = getReadableDatabase();
+        if (db != null) {
+            Cursor cursor = db.query(Sounds.TABLE_NAME,
+                    new String[]{BaseColumns._ID,
+                            Sounds.NamesColoumns.SOUNDTITLE,
+                            Sounds.NamesColoumns.SOUNDMP3LINK,
+                            Sounds.NamesColoumns.SOUNDJPGLINK,
+                            Sounds.NamesColoumns.DOWNLOADED},
+                    Sounds.NamesColoumns.SOUNDMP3LINK + "=?",
+                    new String[]{songUrl},
+                    null, null, null, null
+            );
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    return true;
+                }
+
+
+            }
+        }
+        return false;
+    }
+
     public Sound getSong(int id) {
         SQLiteDatabase db = getReadableDatabase();
 
