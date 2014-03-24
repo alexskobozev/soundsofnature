@@ -115,7 +115,7 @@ public class MainActivity extends BaseActivity implements
                 Toast.makeText(this, resultData.getString("data"), Toast.LENGTH_LONG).show();
                 dismissProgressDialog();
             } else if (resultCode == GetSongListCommand.RESPONSE_PROGRESS) {
-                upodateProgressDialog(resultData.getInt(BaseCommand.EXTRA_PROGRESS, -1));
+                updateProgressDialog(resultData.getInt(BaseCommand.EXTRA_PROGRESS, -1));
             } else {
                 Toast.makeText(this, resultData.getString("error"), Toast.LENGTH_LONG).show();
                 dismissProgressDialog();
@@ -253,7 +253,7 @@ public class MainActivity extends BaseActivity implements
         }
     }
 
-    private void upodateProgressDialog(int progress) {
+    private void updateProgressDialog(int progress) {
         ProgressDialogFragment progressDialog = (ProgressDialogFragment) getSupportFragmentManager().findFragmentByTag(
                 PROGRESS_DIALOG);
         if (progressDialog != null) {

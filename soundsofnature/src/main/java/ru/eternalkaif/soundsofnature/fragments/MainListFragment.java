@@ -1,6 +1,10 @@
 package ru.eternalkaif.soundsofnature.fragments;
 
 import android.app.Activity;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,6 +17,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import ru.eternalkaif.soundsofnature.R;
+import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
@@ -25,7 +30,7 @@ import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class MainListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class MainListFragment extends Fragment implements AbsListView.OnItemClickListener,LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -76,8 +81,7 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
         }
 
         // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        mAdapter = new SoundsListCursorAdapter(getActivity(),)
     }
 
     @Override
@@ -136,4 +140,19 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
     }
 
 
+    @Override
+    public Loader onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
+    }
+
+
+    @Override
+    public void onLoaderReset(Loader loader) {
+
+    }
 }
