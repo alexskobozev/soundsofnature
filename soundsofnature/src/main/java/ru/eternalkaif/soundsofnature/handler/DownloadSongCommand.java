@@ -7,13 +7,16 @@ import android.os.Parcelable;
 import android.os.ResultReceiver;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 public class DownloadSongCommand extends BaseCommand {
 
     public static final Parcelable.Creator<DownloadSongCommand> CREATOR = new Parcelable.Creator<DownloadSongCommand>() {
-        public DownloadSongCommand createFromParcel(Parcel in) {
+        public DownloadSongCommand createFromParcel(@NotNull Parcel in) {
             return new DownloadSongCommand(in);
         }
 
+        @NotNull
         @Override
         public DownloadSongCommand[] newArray(int i) {
             return new DownloadSongCommand[i];
@@ -26,7 +29,7 @@ public class DownloadSongCommand extends BaseCommand {
         this.url = url;
     }
 
-    protected DownloadSongCommand(Parcel in) {
+    protected DownloadSongCommand(@NotNull Parcel in) {
         url = in.readString();
         Log.d("Command", "is runing");
     }
@@ -42,7 +45,7 @@ public class DownloadSongCommand extends BaseCommand {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
+    public void writeToParcel(@NotNull Parcel parcel, int i) {
         parcel.writeString(url);
     }
 

@@ -3,6 +3,8 @@ package ru.eternalkaif.soundsofnature;
 import android.app.Application;
 import android.content.Context;
 
+import org.jetbrains.annotations.Nullable;
+
 public class BaseApplication extends Application {
 
     public static final String PACKAGE = "ru.eternalkaif.soundsofnature";
@@ -19,6 +21,7 @@ public class BaseApplication extends Application {
         return serviceHelper;
     }
 
+    @Nullable
     public static BaseApplication getApplication(Context context) {
         if (context instanceof BaseApplication) {
             return (BaseApplication) context;

@@ -10,6 +10,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -18,6 +19,7 @@ import java.util.List;
 public class HttpHandler {
     public final static int GET = 1;
     public final static int POST = 2;
+    @Nullable
     static String response = null;
 
     public HttpHandler() {
@@ -30,6 +32,7 @@ public class HttpHandler {
      * @url - url to make request
      * @method - http request method
      */
+    @Nullable
     public String makeServiceCall(String url, int method) {
         return this.makeServiceCall(url, method, null);
     }
@@ -41,8 +44,9 @@ public class HttpHandler {
      * @method - http request method
      * @params - http request params
      */
+    @Nullable
     public String makeServiceCall(String url, int method,
-                                  List<NameValuePair> params) {
+                                  @Nullable List<NameValuePair> params) {
         try {
             // http client
             DefaultHttpClient httpClient = new DefaultHttpClient();

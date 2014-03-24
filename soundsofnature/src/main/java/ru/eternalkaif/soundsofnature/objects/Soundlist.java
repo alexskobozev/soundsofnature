@@ -1,5 +1,7 @@
 package ru.eternalkaif.soundsofnature.objects;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
 public class Soundlist {
@@ -18,6 +20,7 @@ public class Soundlist {
         this.soundlist = soundlist;
     }
 
+    @NotNull
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();

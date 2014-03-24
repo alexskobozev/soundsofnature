@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,6 +26,7 @@ public class GetSongListCommand extends BaseCommand {
             return new GetSongListCommand(in);
         }
 
+        @NotNull
         @Override
         public GetSongListCommand[] newArray(int i) {
             return new GetSongListCommand[i];
@@ -40,7 +43,7 @@ public class GetSongListCommand extends BaseCommand {
     }
 
     @Override
-    protected void doExecute(Intent intent, Context context, ResultReceiver callback) {
+    protected void doExecute(Intent intent, @NotNull Context context, ResultReceiver callback) {
 
         Bundle data = new Bundle();
 

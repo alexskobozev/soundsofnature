@@ -12,6 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
@@ -33,9 +36,12 @@ public class DownloadedListFragment extends Fragment implements AbsListView.OnIt
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
+    @Nullable
     private String mParam1;
+    @Nullable
     private String mParam2;
 
+    @Nullable
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -50,6 +56,7 @@ public class DownloadedListFragment extends Fragment implements AbsListView.OnIt
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
+    @NotNull
     public static DownloadedListFragment newInstance(String param1, String param2) {
         DownloadedListFragment fragment = new DownloadedListFragment();
         Bundle args = new Bundle();
@@ -80,8 +87,9 @@ public class DownloadedListFragment extends Fragment implements AbsListView.OnIt
                 android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_downloadedlistfragment, container, false);
 
@@ -96,7 +104,7 @@ public class DownloadedListFragment extends Fragment implements AbsListView.OnIt
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NotNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;

@@ -10,6 +10,8 @@ import android.os.ResultReceiver;
 import android.util.Log;
 import android.util.SparseArray;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -22,9 +24,12 @@ public class ServiceHelper {
 
     private Application application;
 
+    @NotNull
     private ArrayList<ServiceCallbackListener> currentListeners = new ArrayList<ServiceCallbackListener>();
 
+    @NotNull
     private SparseArray<Intent> pendingActivities = new SparseArray<Intent>();
+    @NotNull
     private AtomicInteger idCounter = new AtomicInteger();
 
     public ServiceHelper(Application application) {
@@ -64,6 +69,7 @@ public class ServiceHelper {
         return pendingActivities.get(requestId) != null;
     }
 
+    @NotNull
     private Intent createIntent(final Context context, BaseCommand command, final int requestId) {
 
         Intent intent = new Intent(context, CommandExecutorService.class);
@@ -106,7 +112,7 @@ public class ServiceHelper {
         pendingActivities.remove(requestId);
     }
 
-    public boolean check(Intent requestIntent, Class<? extends BaseCommand> myclass) {
+    public boolean check(@NotNull Intent requestIntent, Class<? extends BaseCommand> myclass) {
 
         Parcelable commandExtra = requestIntent.getParcelableExtra(CommandExecutorService.EXTRA_COMMAND);
         return commandExtra != null && commandExtra.getClass().equals(myclass);

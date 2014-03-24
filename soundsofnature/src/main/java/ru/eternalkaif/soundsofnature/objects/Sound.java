@@ -1,5 +1,7 @@
 package ru.eternalkaif.soundsofnature.objects;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Sound {
     public String soundtitle;
     public String soundmp3link;
@@ -37,6 +39,7 @@ public class Sound {
         this.soundjpglink = soundjpglink;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return "Sound{" +

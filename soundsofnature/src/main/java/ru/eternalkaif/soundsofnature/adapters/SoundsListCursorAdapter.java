@@ -9,6 +9,9 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
 
@@ -20,7 +23,7 @@ public class SoundsListCursorAdapter extends CursorAdapter {
     private Cursor mCursor;
     private Context mContext;
 
-    public SoundsListCursorAdapter(Context context, Cursor c, int flags) {
+    public SoundsListCursorAdapter(@NotNull Context context, @NotNull Cursor c, int flags) {
         super(context, c, flags);
         mInflater = (LayoutInflater.from(context));
         mCursor = c;
@@ -30,13 +33,14 @@ public class SoundsListCursorAdapter extends CursorAdapter {
 
     }
 
+    @Nullable
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return mInflater.inflate(R.layout.row_songlist, parent, false);
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public void bindView(@NotNull View view, Context context, @NotNull Cursor cursor) {
         TextView rowText = (TextView) view.findViewById(R.id.songsText);
         rowText.setText(cursor.getString(cursor
                 .getColumnIndex(SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE)));

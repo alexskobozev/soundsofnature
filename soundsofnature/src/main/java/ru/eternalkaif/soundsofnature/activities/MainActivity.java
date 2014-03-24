@@ -17,6 +17,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
@@ -107,7 +110,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onServiceCallBack(int requestId, Intent requestIntent, int resultCode, Bundle resultData) {
+    public void onServiceCallBack(int requestId, Intent requestIntent, int resultCode, @NotNull Bundle resultData) {
         super.onServiceCallBack(requestId, requestIntent, resultCode, resultData);
 
         if (getServiceHelper().check(requestIntent, GetSongListCommand.class)) {
@@ -125,6 +128,7 @@ public class MainActivity extends BaseActivity implements
 
     public static class ProgressDialogFragment extends DialogFragment {
 
+        @NotNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -146,7 +150,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onRestoreInstanceState(@NotNull Bundle savedInstanceState) {
         // Restore the previously serialized current dropdown position.
         if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
             getSupportActionBar().setSelectedNavigationItem(
@@ -157,7 +161,7 @@ public class MainActivity extends BaseActivity implements
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NotNull Bundle outState) {
         // Serialize the current dropdown position.
         outState.putInt(STATE_SELECTED_NAVIGATION_ITEM,
                 getSupportActionBar().getSelectedNavigationIndex());
@@ -173,7 +177,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NotNull MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
@@ -204,6 +208,7 @@ public class MainActivity extends BaseActivity implements
         return true;
     }
 
+    @Nullable
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
@@ -222,7 +227,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NotNull Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
             case LOADER_ID:
                 mAdapter.swapCursor(data);

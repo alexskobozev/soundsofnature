@@ -7,6 +7,9 @@ import android.os.Process;
 import android.os.ResultReceiver;
 import android.util.SparseArray;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,6 +26,7 @@ public class CommandExecutorService extends Service {
     private static final int NUM_TREADS = 4;
     private ExecutorService executor = Executors.newFixedThreadPool(NUM_TREADS);
 
+    @NotNull
     private SparseArray<RunningCommand> runningCommands = new SparseArray<RunningCommand>();
 
     @Override
@@ -31,7 +35,7 @@ public class CommandExecutorService extends Service {
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(@NotNull Intent intent, int flags, int startId) {
 
         if (ACTION_EXECUTE_COMMAND.equals(intent.getAction())) {
             RunningCommand runningCommand = new RunningCommand(intent);
@@ -50,15 +54,17 @@ public class CommandExecutorService extends Service {
         return START_NOT_STICKY;
     }
 
-    private int getCommandId(Intent intent) {
+    private int getCommandId(@NotNull Intent intent) {
         return intent.getIntExtra(EXTRA_REQUEST_ID, -1);
     }
 
-    private ResultReceiver getReceiver(Intent intent) {
+    @Nullable
+    private ResultReceiver getReceiver(@NotNull Intent intent) {
         return intent.getParcelableExtra(EXTRA_STATUS_RECEIVER);
     }
 
-    private BaseCommand getCommand(Intent intent) {
+    @Nullable
+    private BaseCommand getCommand(@NotNull Intent intent) {
         return intent.getParcelableExtra(EXTRA_COMMAND);
     }
 
@@ -76,9 +82,10 @@ public class CommandExecutorService extends Service {
     private class RunningCommand implements Runnable {
 
         private Intent intent;
+        @Nullable
         private BaseCommand command;
 
-        public RunningCommand(Intent intent) {
+        public RunningCommand(@NotNull Intent intent) {
             this.intent = intent;
             command = getCommand(intent);
         }

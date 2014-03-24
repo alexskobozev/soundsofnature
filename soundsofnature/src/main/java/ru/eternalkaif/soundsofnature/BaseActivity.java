@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
+import org.jetbrains.annotations.NotNull;
+
 public abstract class BaseActivity extends ActionBarActivity implements ServiceCallbackListener {
 
     private ServiceHelper serviceHelper;
 
+    @NotNull
     protected BaseApplication getApp() {
         return (BaseApplication) getApplication();
     }

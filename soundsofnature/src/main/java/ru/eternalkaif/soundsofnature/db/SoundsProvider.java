@@ -11,6 +11,9 @@ import android.net.Uri;
 import android.provider.BaseColumns;
 import android.text.TextUtils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -37,6 +40,7 @@ public class SoundsProvider extends ContentProvider {
         sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SOUND_ID);
     }
 
+    @Nullable
     private SoundsOpenHelper database;
 
 
@@ -45,42 +49,46 @@ public class SoundsProvider extends ContentProvider {
 
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NotNull Uri uri, String selection, String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
         int rowsDeleted = 0;
-        switch (uriType) {
-            case SOUNDS:
-                rowsDeleted = sqLiteDatabase.delete(SoundsDataBaseContract.Sounds.TABLE_NAME,
-                        selection, selectionArgs);
-                break;
-            case SOUND_ID:
-                String id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
+        if (sqLiteDatabase != null) {
+            switch (uriType) {
+                case SOUNDS:
                     rowsDeleted = sqLiteDatabase.delete(SoundsDataBaseContract.Sounds.TABLE_NAME,
-                            BaseColumns._ID + " = " + id,
-                            null);
-                } else {
-                    rowsDeleted = sqLiteDatabase.delete(SoundsDataBaseContract.Sounds.TABLE_NAME,
-                            BaseColumns._ID + " = " + id + " and " + selection,
-                            selectionArgs
-                    );
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown URI " + uri);
+                            selection, selectionArgs);
+                    break;
+                case SOUND_ID:
+                    String id = uri.getLastPathSegment();
+                    if (TextUtils.isEmpty(selection)) {
+                        rowsDeleted = sqLiteDatabase.delete(SoundsDataBaseContract.Sounds.TABLE_NAME,
+                                BaseColumns._ID + " = " + id,
+                                null);
+                    } else {
+                        rowsDeleted = sqLiteDatabase.delete(SoundsDataBaseContract.Sounds.TABLE_NAME,
+                                BaseColumns._ID + " = " + id + " and " + selection,
+                                selectionArgs
+                        );
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown URI " + uri);
+            }
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
     }
 
+    @Nullable
     @Override
     public String getType(Uri uri) {
         return null;
     }
 
+    @NotNull
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NotNull Uri uri, ContentValues values) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
         int rowsDeleted = 0;
@@ -102,8 +110,9 @@ public class SoundsProvider extends ContentProvider {
         return false;
     }
 
+    @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection,
+    public Cursor query(@NotNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
@@ -130,43 +139,47 @@ public class SoundsProvider extends ContentProvider {
 
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection,
+    public int update(@NotNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
         int uriType = sURIMatcher.match(uri);
         SQLiteDatabase sqLiteDatabase = database.getWritableDatabase();
         int rowsUpdated = 0;
-        switch (uriType) {
-            case SOUNDS:
-                rowsUpdated = sqLiteDatabase.update(SoundsDataBaseContract.Sounds.TABLE_NAME,
-                        values,
-                        selection,
-                        selectionArgs);
-                break;
-            case SOUND_ID:
-                String id = uri.getLastPathSegment();
-                if (TextUtils.isEmpty(selection)) {
+        if (sqLiteDatabase != null) {
+            switch (uriType) {
+                case SOUNDS:
                     rowsUpdated = sqLiteDatabase.update(SoundsDataBaseContract.Sounds.TABLE_NAME,
                             values,
-                            BaseColumns._ID + " = " + id,
-                            null);
-                } else {
-                    rowsUpdated = sqLiteDatabase.update(SoundsDataBaseContract.Sounds.TABLE_NAME,
-                            values,
-                            BaseColumns._ID + " = " + id
-                                    + " and " + selection,
-                            selectionArgs
-                    );
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown URI " + uri);
+                            selection,
+                            selectionArgs);
+                    break;
+                case SOUND_ID:
+                    String id = uri.getLastPathSegment();
+                    if (TextUtils.isEmpty(selection)) {
 
+                        rowsUpdated = sqLiteDatabase.update(SoundsDataBaseContract.Sounds.TABLE_NAME,
+                                values,
+                                BaseColumns._ID + " = " + id,
+                                null);
+
+                    } else {
+                        rowsUpdated = sqLiteDatabase.update(SoundsDataBaseContract.Sounds.TABLE_NAME,
+                                values,
+                                BaseColumns._ID + " = " + id
+                                        + " and " + selection,
+                                selectionArgs
+                        );
+                    }
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown URI " + uri);
+
+            }
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
     }
 
-    private void checkColoumns(String[] projection) {
+    private void checkColoumns(@Nullable String[] projection) {
         String[] available = {
                 SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE,
                 SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDMP3LINK,

@@ -1,5 +1,7 @@
 package ru.eternalkaif.soundsofnature.fragments.dummy;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,11 +18,13 @@ public class DummyContent {
     /**
      * An array of sample (dummy) items.
      */
+    @NotNull
     public static List<DummyItem> ITEMS = new ArrayList<DummyItem>();
 
     /**
      * A map of sample (dummy) items, by ID.
      */
+    @NotNull
     public static Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
 
     static {
@@ -30,7 +34,7 @@ public class DummyContent {
         addItem(new DummyItem("3", "Item 3"));
     }
 
-    private static void addItem(DummyItem item) {
+    private static void addItem(@NotNull DummyItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }

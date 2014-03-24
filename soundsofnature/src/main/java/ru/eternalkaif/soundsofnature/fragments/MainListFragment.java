@@ -16,6 +16,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
@@ -38,9 +41,12 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
+    @Nullable
     private String mParam1;
+    @Nullable
     private String mParam2;
 
+    @Nullable
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -55,6 +61,7 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
+    @NotNull
     public static MainListFragment newInstance(String param1, String param2) {
         MainListFragment fragment = new MainListFragment();
         Bundle args = new Bundle();
@@ -84,8 +91,9 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
         mAdapter = new SoundsListCursorAdapter(getActivity(),)
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_mainlistfragment, container, false);
 
@@ -100,7 +108,7 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
     }
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(@NotNull Activity activity) {
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;
@@ -140,6 +148,7 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
     }
 
 
+    @NotNull
     @Override
     public Loader onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(getActivity());

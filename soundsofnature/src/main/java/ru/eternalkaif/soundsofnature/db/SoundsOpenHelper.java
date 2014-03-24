@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +29,7 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
 
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(@NotNull SQLiteDatabase db) {
         String CREATE_SOUNDS_TABLE = "CREATE TABLE " + Sounds.TABLE_NAME + " ("
                 + BaseColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + Sounds.NamesColoumns.SOUNDTITLE + " TEXT NOT NULL, "
@@ -38,13 +41,13 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(@NotNull SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP DATABASE IF EXISTS " + Sounds.TABLE_NAME);
         onCreate(db);
     }
 
 
-    public void addSong(Sound item) {
+    public void addSong(@NotNull Sound item) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -84,6 +87,7 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
         return false;
     }
 
+    @Nullable
     public Sound getSong(int id) {
         SQLiteDatabase db = getReadableDatabase();
 
@@ -112,6 +116,7 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
 
     }
 
+    @NotNull
     public List<Sound> getAllSongs() {
 
         List<Sound> soundList = new ArrayList<Sound>();
@@ -161,7 +166,7 @@ public class SoundsOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public void dropTables(SQLiteDatabase db) {
+    public void dropTables(@NotNull SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS " + Sounds.TABLE_NAME);
     }
 }

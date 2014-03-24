@@ -17,6 +17,9 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 import ru.eternalkaif.soundsofnature.R;
@@ -96,7 +99,7 @@ public class SettingsActivity extends PreferenceActivity {
      * Helper method to determine if the device has an extra-large screen. For
      * example, 10" tablets are extra-large.
      */
-    private static boolean isXLargeTablet(Context context) {
+    private static boolean isXLargeTablet(@NotNull Context context) {
         return (context.getResources().getConfiguration().screenLayout
         & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
@@ -108,7 +111,7 @@ public class SettingsActivity extends PreferenceActivity {
      * doesn't have an extra-large screen. In these cases, a single-pane
      * "simplified" settings UI should be shown.
      */
-    private static boolean isSimplePreferences(Context context) {
+    private static boolean isSimplePreferences(@NotNull Context context) {
         return ALWAYS_SIMPLE_PREFS
                 || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
                 || !isXLargeTablet(context);
@@ -117,7 +120,7 @@ public class SettingsActivity extends PreferenceActivity {
     /** {@inheritDoc} */
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
+    public void onBuildHeaders(@NotNull List<Header> target) {
         if (!isSimplePreferences(this)) {
             loadHeadersFromResource(R.xml.pref_headers, target);
         }
@@ -127,9 +130,10 @@ public class SettingsActivity extends PreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+    @NotNull
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
+        public boolean onPreferenceChange(Preference preference, @NotNull Object value) {
             String stringValue = value.toString();
 
             if (preference instanceof ListPreference) {
@@ -184,7 +188,7 @@ public class SettingsActivity extends PreferenceActivity {
      *
      * @see #sBindPreferenceSummaryToValueListener
      */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
+    private static void bindPreferenceSummaryToValue(@NotNull Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
