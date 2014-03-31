@@ -13,14 +13,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ru.eternalkaif.soundsofnature.R;
+import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
 import ru.eternalkaif.soundsofnature.db.SoundsProvider;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
@@ -65,7 +64,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private SimpleCursorAdapter mAdapter;
+    private SoundsListCursorAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     @NotNull
@@ -93,12 +92,6 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mAdapter = new SimpleCursorAdapter(getActivity().getApplicationContext(),
-                R.layout.row_songlist,
-                null, new String[]{SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE},
-                new int[]{R.id.songsText},
-                0);
-        //mAdapter = new SoundsListCursorAdapter(getActivity(), null, 0);
 
         LoaderManager loaderManager = getLoaderManager();
         loaderManager.initLoader(LOADER_ID, null, this);
@@ -112,7 +105,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -171,10 +164,11 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         switch (cursorLoader.getId()) {
             case LOADER_ID:
-                if (mAdapter != null) {
-                    mAdapter.swapCursor(cursor);
-                }
+                mAdapter = new SoundsListCursorAdapter(getActivity(), cursor, 0);
+                mAdapter.swapCursor(cursor);
+                mListView.setAdapter(mAdapter);
                 break;
+
         }
     }
 

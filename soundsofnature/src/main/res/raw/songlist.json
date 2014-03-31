@@ -5,6 +5,18 @@
             "soundmp3link":"https://archive.org/download/Sounds_of_Nature_Collection/01_Tropical_Rain.mp3",
             "soundjpglink":""
 
+      },
+      {
+                  "soundtitle":"Jungle River",
+                  "soundmp3link":"https://archive.org/download/Sounds_of_Nature_Collection/02_Jungle_River.mp3",
+                  "soundjpglink":""
+
+      },
+      {
+                        "soundtitle":"Birdsong",
+                        "soundmp3link":"https://archive.org/download/Sounds_of_Nature_Collection/03_Birdsong.mp3",
+                        "soundjpglink":""
+
       }
   ]
 }
