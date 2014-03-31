@@ -1,26 +1,28 @@
 package ru.eternalkaif.soundsofnature.fragments;
 
 import android.app.Activity;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.provider.BaseColumns;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ru.eternalkaif.soundsofnature.R;
-import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
+import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
+import ru.eternalkaif.soundsofnature.db.SoundsProvider;
 import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
@@ -30,15 +32,20 @@ import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
  * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
+ * Activities containing this fragment MUST implement the {@link android.support.v7.internal.widget.ActivityChooserView.Callbacks}
  * interface.
  */
-public class MainListFragment extends Fragment implements AbsListView.OnItemClickListener,LoaderManager.LoaderCallbacks<Cursor> {
+public class MainListFragment extends ListFragment implements AbsListView.OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String[] PROJECTION = new String[]{BaseColumns._ID, SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE};
+    private static final int LOADER_ID = 1;
+
+    private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
+
 
     // TODO: Rename and change types of parameters
     @Nullable
@@ -58,7 +65,7 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    private ListAdapter mAdapter;
+    private SimpleCursorAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
     @NotNull
@@ -86,9 +93,15 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mAdapter = new SimpleCursorAdapter(getActivity().getApplicationContext(),
+                R.layout.row_songlist,
+                null, new String[]{SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE},
+                new int[]{R.id.songsText},
+                0);
+        //mAdapter = new SoundsListCursorAdapter(getActivity(), null, 0);
 
-        // TODO: Change Adapter to display your content
-        mAdapter = new SoundsListCursorAdapter(getActivity(),)
+        LoaderManager loaderManager = getLoaderManager();
+        loaderManager.initLoader(LOADER_ID, null, this);
     }
 
     @Nullable
@@ -150,18 +163,24 @@ public class MainListFragment extends Fragment implements AbsListView.OnItemClic
 
     @NotNull
     @Override
-    public Loader onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity());
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity(), SoundsProvider.CONTENT_URI, PROJECTION, null, null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-
+        switch (cursorLoader.getId()) {
+            case LOADER_ID:
+                if (mAdapter != null) {
+                    mAdapter.swapCursor(cursor);
+                }
+                break;
+        }
     }
 
 
     @Override
     public void onLoaderReset(Loader loader) {
-
+        mAdapter.swapCursor(null);
     }
 }

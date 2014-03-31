@@ -15,6 +15,10 @@ public class Sound {
         this.downloaded = downloaded > 0;
     }
 
+    public Sound() {
+
+    }
+
     public String getSoundtitle() {
         return soundtitle;
     }
