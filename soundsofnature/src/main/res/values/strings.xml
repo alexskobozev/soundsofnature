@@ -9,5 +9,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_reload">Reload</string>
     <string name="json_url">http://put_url.com/songlist.json</string>
+    <string name="music_player">Sounds of Nature</string>
 
 </resources>

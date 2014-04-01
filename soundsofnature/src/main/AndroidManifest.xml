@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.eternalkaif.soundsofnature">
+    package="ru.eternalkaif.soundsofnature" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name="ru.eternalkaif.soundsofnature.BaseApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="ru.eternalkaif.soundsofnature.activities.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,11 +23,11 @@
         </activity>
         <activity
             android:name="ru.eternalkaif.soundsofnature.activities.SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+            android:label="@string/title_activity_settings" />
         <activity
             android:name="ru.eternalkaif.soundsofnature.activities.PlayerActivity"
             android:label="@string/title_activity_player"
-            android:parentActivityName="ru.eternalkaif.soundsofnature.activities.MainActivity">
+            android:parentActivityName="ru.eternalkaif.soundsofnature.activities.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
@@ -38,7 +39,13 @@
             android:name="ru.eternalkaif.soundsofnature.db.SoundsProvider"
             android:authorities="ru.eternalkaif.db.Sounds"
             android:enabled="true"
-            android:exported="false"></provider>
+            android:exported="false" />
+
+        <service
+            android:name="ru.eternalkaif.soundsofnature.service.MusicService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
     </application>
 
 </manifest>

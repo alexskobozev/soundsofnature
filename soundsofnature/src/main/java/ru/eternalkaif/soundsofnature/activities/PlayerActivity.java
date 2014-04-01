@@ -1,11 +1,9 @@
 package ru.eternalkaif.soundsofnature.activities;
 
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +63,7 @@ public class PlayerActivity extends BaseActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
+    public static class PlaceholderFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
         private static final String SONGURL = "songurl";
         public static final String TAG = "mediaplayer";
@@ -105,16 +104,21 @@ public class PlayerActivity extends BaseActivity {
 
             seekBarProgress = (SeekBar) rootView.findViewById(R.id.seekBar);
             seekBarProgress.setOnTouchListener(this);
-            if (mp != null) {
-                mp.release();
-            }
-            mp = MediaPlayer.create(getActivity(), Uri.parse(url));
-            mp.setOnBufferingUpdateListener(this);
-            mp.setOnCompletionListener(this);
-            mediaFileLengthInMilliseconds = mp.getDuration();
-            mp.start();
-            Log.d(TAG, "Media player started on link " + url);
-            primarySeekBarProgressUpdater();
+
+        
+
+          //  mp = MediaPlayer.create(getActivity(), Uri.parse(url));
+//            mp = new MediaPlayer();
+//
+//
+//            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+//            mp.setOnBufferingUpdateListener(this);
+//            mp.setOnCompletionListener(this);
+//            mp.setOnErrorListener(this);
+//            mediaFileLengthInMilliseconds = mp.getDuration();
+//            mp.start();
+//            Log.d(TAG, "Media player started on link " + url);
+//            primarySeekBarProgressUpdater();
 
             return rootView;
         }
@@ -137,7 +141,7 @@ public class PlayerActivity extends BaseActivity {
                 if (!mp.isPlaying()) {
                     mp.start();
                 } else {
-                    mp.stop();
+                    mp.pause();
                 }
 
             }
@@ -156,6 +160,20 @@ public class PlayerActivity extends BaseActivity {
         }
 
         @Override
+        public void onPause() {
+            super.onPause();
+            //Just for debugging
+            mp.stop();
+        }
+
+        @Override
+        public void onStop() {
+            super.onStop();
+            mp.release();
+
+        }
+
+        @Override
         public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
             seekBarProgress.setSecondaryProgress(i);
         }
@@ -163,6 +181,12 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
 
+        }
+
+        @Override
+        public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
+            Toast.makeText(getActivity(), "MediaPlayer Error (" + i + "," + i2 + ")", Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
