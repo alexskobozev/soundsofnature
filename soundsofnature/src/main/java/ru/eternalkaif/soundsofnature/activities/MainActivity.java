@@ -14,6 +14,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -31,7 +33,7 @@ import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
 public class MainActivity extends BaseActivity implements
         ActionBar.OnNavigationListener, LoaderManager.LoaderCallbacks<Cursor>,
-        OnFragmentInteractionListener {
+        OnFragmentInteractionListener, AdapterView.OnItemClickListener {
 
     /**
      * The serialization (saved instance state) Bundle key representing the
@@ -124,6 +126,11 @@ public class MainActivity extends BaseActivity implements
                 dismissProgressDialog();
             }
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        
     }
 
     public static class ProgressDialogFragment extends DialogFragment {

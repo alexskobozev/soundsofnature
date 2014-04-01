@@ -1,9 +1,11 @@
 package ru.eternalkaif.soundsofnature.activities;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,8 +17,6 @@ import android.widget.SeekBar;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.io.IOException;
 
 import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
@@ -67,6 +67,7 @@ public class PlayerActivity extends BaseActivity {
     public static class PlaceholderFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener {
 
         private static final String SONGURL = "songurl";
+        public static final String TAG = "mediaplayer";
         private Button buttonPlayPause;
         private SeekBar seekBarProgress;
         private MediaPlayer mp;
@@ -99,15 +100,21 @@ public class PlayerActivity extends BaseActivity {
         public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_player, container, false);
-            buttonPlayPause = (Button) getActivity().findViewById(R.id.btn_playpause);
+            buttonPlayPause = (Button) rootView.findViewById(R.id.btn_playpause);
             buttonPlayPause.setOnClickListener(this);
 
-            seekBarProgress = (SeekBar) getActivity().findViewById(R.id.seekBar);
+            seekBarProgress = (SeekBar) rootView.findViewById(R.id.seekBar);
             seekBarProgress.setOnTouchListener(this);
-
-            mp = new MediaPlayer();
+            if (mp != null) {
+                mp.release();
+            }
+            mp = MediaPlayer.create(getActivity(), Uri.parse(url));
             mp.setOnBufferingUpdateListener(this);
             mp.setOnCompletionListener(this);
+            mediaFileLengthInMilliseconds = mp.getDuration();
+            mp.start();
+            Log.d(TAG, "Media player started on link " + url);
+            primarySeekBarProgressUpdater();
 
             return rootView;
         }
@@ -127,20 +134,12 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onClick(View view) {
             if (view.getId() == R.id.btn_playpause) {
-                try {
-                    mp.setDataSource(url);
-                    mp.prepare();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                mediaFileLengthInMilliseconds = mp.getDuration();
                 if (!mp.isPlaying()) {
                     mp.start();
                 } else {
                     mp.stop();
                 }
-                primarySeekBarProgressUpdater();
+
             }
         }
 

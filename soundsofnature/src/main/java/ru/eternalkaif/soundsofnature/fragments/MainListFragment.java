@@ -1,6 +1,7 @@
 package ru.eternalkaif.soundsofnature.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -8,6 +9,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ru.eternalkaif.soundsofnature.R;
+import ru.eternalkaif.soundsofnature.activities.PlayerActivity;
 import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
 import ru.eternalkaif.soundsofnature.db.SoundsProvider;
-import ru.eternalkaif.soundsofnature.fragments.dummy.DummyContent;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
 
 /**
@@ -40,7 +42,9 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static final String[] PROJECTION = new String[]{BaseColumns._ID, SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE};
+    private static final String[] PROJECTION = new String[]{BaseColumns._ID,
+            SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDTITLE,
+            SoundsDataBaseContract.Sounds.NamesColoumns.SOUNDMP3LINK};
     private static final int LOADER_ID = 1;
 
     private LoaderManager.LoaderCallbacks<Cursor> mCallbacks;
@@ -105,7 +109,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
+       // mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -133,11 +137,21 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-        }
+        int pqosition = (int) parent.getSelectedItemId();
+        Log.i("Position:", Integer.toString(pqosition));
+
+        Log.d("ITEMCLICK",position+"");
+            Intent intent = new Intent(getActivity(), PlayerActivity.class);
+            Cursor cursor = mAdapter.getCursor();
+            if (cursor.moveToPosition(position)){
+                Log.d("ITEMCLICK",cursor.toString()+"");
+
+                intent.putExtra("songurl", cursor.getString(cursor
+                        .getColumnIndexOrThrow(SoundsDataBaseContract
+                                .Sounds.NamesColoumns.SOUNDMP3LINK)));
+            }
+            startActivity(intent);
+
     }
 
     /**
@@ -167,6 +181,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
                 mAdapter = new SoundsListCursorAdapter(getActivity(), cursor, 0);
                 mAdapter.swapCursor(cursor);
                 mListView.setAdapter(mAdapter);
+                mListView.setOnItemClickListener(this);
                 break;
 
         }

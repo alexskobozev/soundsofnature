@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingLeft="10dp"
-    android:paddingRight="10dp">
+    android:paddingRight="10dp"
+    android:focusable="false"
+   >
 
     <TextView
         android:layout_width="wrap_content"
@@ -14,13 +16,13 @@
         android:text="song"
         android:textSize="16sp"
         android:layout_centerVertical="true"/>
-    <Button
+    <ImageView
         android:id="@+id/btn_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/ic_play"
         android:layout_alignParentEnd="true"/>
-    <Button
+    <ImageView
         android:id="@+id/btn_download"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
