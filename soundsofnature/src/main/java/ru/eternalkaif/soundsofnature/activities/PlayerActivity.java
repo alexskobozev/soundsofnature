@@ -217,10 +217,10 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onStop() {
             super.onStop();
-            if (mBound) {
-                getActivity().unbindService(mConnecion);
-                mBound = false;
-            }
+//            if (mBound) {
+//                getActivity().unbindService(mConnecion);
+//                mBound = false;
+//            }
         }
 
         @Override

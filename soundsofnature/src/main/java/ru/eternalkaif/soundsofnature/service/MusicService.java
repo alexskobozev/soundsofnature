@@ -1,5 +1,6 @@
 package ru.eternalkaif.soundsofnature.service;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -12,6 +13,7 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import java.io.IOException;
 
@@ -104,13 +106,23 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
+            RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+            contentView.setTextViewText(R.id.tv_action_name, getResources().getString(R.string.music_player));
+            contentView.setTextViewText(R.id.songName, songName);
+
             NotificationCompat.Builder notificationCompat = new NotificationCompat.Builder(
                     getApplicationContext());
             notificationCompat
                     .setContentTitle(getResources().getString(R.string.music_player))
                     .setContentText(songName)
                     .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentIntent(pendingIntent);
+                    .setContentIntent(pendingIntent)
+            .setContent(contentView);
+
+
+
+            NotificationManager mNotificationMandger = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
 
             //  mediaPlayer = MediaPlayer.create(this, Uri.parse(url));
             mediaPlayer = new MediaPlayer();
