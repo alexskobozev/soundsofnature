@@ -7,9 +7,11 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -20,19 +22,30 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     public static final String SONG_URL = "songurl";
     public static final String SONG_NAME = "songname";
     public static final String ACTION_PLAY = "START_PLAY";
+    private static final String TAG = "MusicService";
     private String url;
     private boolean isPlaying;
     private String songName;
     private MediaPlayer mediaPlayer;
     private WifiManager.WifiLock wifiLock;
+    private final IBinder mBinder = new LocalBinder();
+    private boolean mPrepared;
 
     public MusicService() {
     }
 
+    public class LocalBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        Log.d(TAG, "onBind");
+        wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
+                .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
+        return mBinder;
     }
 
     @Override
@@ -46,23 +59,43 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction() != null) {
-            if (intent.getExtras() != null) {
-                url = intent.getStringExtra(SONG_URL);
-                songName = intent.getStringExtra(SONG_NAME);
-                if (intent.getAction().equals(ACTION_PLAY)) {
-                    play();
-                }
-            }
-        }
-
+        Log.d(TAG, "onStartCommand");
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
+        if (intent != null)
+            if (intent.getAction() != null) {
+                if (intent.getExtras() != null) {
+                    url = intent.getStringExtra(SONG_URL);
+                    songName = intent.getStringExtra(SONG_NAME);
+                    if (intent.getAction().equals(ACTION_PLAY)) {
+                        play(url);
+                    }
+                }
+            }
+
 
         return Service.START_STICKY;
     }
 
-    private void play() {
+    public boolean isPlaying() {
+        return mediaPlayer.isPlaying();
+    }
+
+    public void pause() {
+        Log.d(TAG, "pause");
+
+        mediaPlayer.pause();
+    }
+
+    public void resumePlay() {
+        Log.d(TAG, "resumePlay");
+        if (mPrepared) {
+            mediaPlayer.start();
+        } else play(url);
+    }
+
+    public void play(String url) {
+        Log.d(TAG, "play");
         if (!isPlaying) {
             isPlaying = true;
             Intent intent = new Intent(this, PlayerActivity.class);
@@ -96,7 +129,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         }
     }
 
-    private void stop() {
+    public void stop() {
         if (isPlaying) {
             isPlaying = false;
             if (mediaPlayer != null) {
@@ -105,17 +138,21 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
             }
             wifiLock.release();
             stopForeground(true);
+            mPrepared = false;
         }
     }
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy");
         super.onDestroy();
         stop();
     }
 
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
+        Log.d(TAG, "onPrepared");
+        mPrepared = true;
         mediaPlayer.start();
     }
 }
