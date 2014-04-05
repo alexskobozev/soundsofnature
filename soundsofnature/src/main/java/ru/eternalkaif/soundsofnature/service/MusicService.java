@@ -1,10 +1,10 @@
 package ru.eternalkaif.soundsofnature.service;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -15,36 +15,41 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.RemoteViews;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.IOException;
 
 import ru.eternalkaif.soundsofnature.R;
 import ru.eternalkaif.soundsofnature.activities.PlayerActivity;
 
-public class MusicService extends Service implements MediaPlayer.OnErrorListener, MediaPlayer.OnPreparedListener {
+public class MusicService extends Service implements MediaPlayer.OnErrorListener,
+        MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnBufferingUpdateListener {
     public static final String SONG_URL = "songurl";
     public static final String SONG_NAME = "songname";
     public static final String ACTION_PLAY = "START_PLAY";
     private static final String TAG = "MusicService";
+    private final IBinder mBinder = new LocalBinder();
+    int progress;
+    int secondaryProgress;
+    @Nullable
     private String url;
     private boolean isPlaying;
+    @Nullable
     private String songName;
+    @Nullable
     private MediaPlayer mediaPlayer;
     private WifiManager.WifiLock wifiLock;
-    private final IBinder mBinder = new LocalBinder();
     private boolean mPrepared;
+    private int bufferProgress;
 
     public MusicService() {
     }
 
-    public class LocalBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
-    }
-
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind");
+        Log.d(TAG, "onBind " + intent.getPackage());
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
         return mBinder;
@@ -60,7 +65,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+    public int onStartCommand(@Nullable Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand");
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE))
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
@@ -80,20 +85,30 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     }
 
     public boolean isPlaying() {
-        return mediaPlayer.isPlaying();
+        return mPrepared && getMp().isPlaying();
     }
 
     public void pause() {
         Log.d(TAG, "pause");
-
-        mediaPlayer.pause();
+        getMp().pause();
     }
 
     public void resumePlay() {
         Log.d(TAG, "resumePlay");
         if (mPrepared) {
-            mediaPlayer.start();
+            getMp().start();
         } else play(url);
+    }
+
+    /**
+     * @return MediaPlayer at least in idle state
+     */
+    private MediaPlayer getMp() {
+        if (mediaPlayer == null) {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.reset();
+        }
+        return mediaPlayer;
     }
 
     public void play(String url) {
@@ -117,19 +132,17 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                     .setContentText(songName)
                     .setSmallIcon(R.drawable.ic_launcher)
                     .setContentIntent(pendingIntent)
-            .setContent(contentView);
+                    .setContent(contentView);
 
 
-
-            NotificationManager mNotificationMandger = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-
-            //  mediaPlayer = MediaPlayer.create(this, Uri.parse(url));
             mediaPlayer = new MediaPlayer();
             try {
+                mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.setDataSource(this, Uri.parse(url));
                 mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
                 mediaPlayer.setOnPreparedListener(this);
+                mediaPlayer.setOnBufferingUpdateListener(this);
+
                 mediaPlayer.prepareAsync();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -140,6 +153,22 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
         }
     }
+
+    public int getProgress() {
+        int progress = 0;
+        if (getMp().isPlaying()) {
+            progress = (int) (((float) getMp().getCurrentPosition()
+                    / getMp().getDuration()) * 100);
+        }
+        Log.d(TAG, "progress " + progress);
+
+        return progress;
+    }
+
+    public int getSecondaryProgress() {
+        return bufferProgress;
+    }
+
 
     public void stop() {
         if (isPlaying) {
@@ -162,9 +191,22 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     }
 
     @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
+    public void onPrepared(@NotNull MediaPlayer mediaPlayer) {
         Log.d(TAG, "onPrepared");
         mPrepared = true;
         mediaPlayer.start();
+    }
+
+    @Override
+    public void onBufferingUpdate(MediaPlayer mp, int percent) {
+        bufferProgress = percent;
+    }
+
+
+    public class LocalBinder extends Binder {
+        @NotNull
+        public MusicService getService() {
+            return MusicService.this;
+        }
     }
 }

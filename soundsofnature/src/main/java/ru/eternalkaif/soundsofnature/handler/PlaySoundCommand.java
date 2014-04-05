@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class PlaySoundCommand extends BaseCommand {
 
     public static final Parcelable.Creator<PlaySoundCommand> CREATOR = new Parcelable.Creator<PlaySoundCommand>() {
-        public PlaySoundCommand createFromParcel(Parcel in) {
+        public PlaySoundCommand createFromParcel(@NotNull Parcel in) {
             return new PlaySoundCommand(in);
         }
 
@@ -33,7 +33,7 @@ public class PlaySoundCommand extends BaseCommand {
     }
 
 
-    private PlaySoundCommand(Parcel in) {
+    private PlaySoundCommand(@NotNull Parcel in) {
 
         url = in.readString();
         Log.d("Command", "is runing");
@@ -56,7 +56,7 @@ public class PlaySoundCommand extends BaseCommand {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
+    public void writeToParcel(@NotNull Parcel parcel, int i) {
         parcel.writeString(url);
     }
 }

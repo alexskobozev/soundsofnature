@@ -109,7 +109,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-       // mListView.setAdapter(mAdapter);
+        // mListView.setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
@@ -136,21 +136,21 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
 
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemClick(@NotNull AdapterView<?> parent, View view, int position, long id) {
         int pqosition = (int) parent.getSelectedItemId();
         Log.i("Position:", Integer.toString(pqosition));
 
-        Log.d("ITEMCLICK",position+"");
-            Intent intent = new Intent(getActivity(), PlayerActivity.class);
-            Cursor cursor = mAdapter.getCursor();
-            if (cursor.moveToPosition(position)){
-                Log.d("ITEMCLICK",cursor.toString()+"");
+        Log.d("ITEMCLICK", position + "");
+        Intent intent = new Intent(getActivity(), PlayerActivity.class);
+        Cursor cursor = mAdapter.getCursor();
+        if (cursor.moveToPosition(position)) {
+            Log.d("ITEMCLICK", cursor.toString() + "");
 
-                intent.putExtra("songurl", cursor.getString(cursor
-                        .getColumnIndexOrThrow(SoundsDataBaseContract
-                                .Sounds.NamesColoumns.SOUNDMP3LINK)));
-            }
-            startActivity(intent);
+            intent.putExtra("songurl", cursor.getString(cursor
+                    .getColumnIndexOrThrow(SoundsDataBaseContract
+                            .Sounds.NamesColoumns.SOUNDMP3LINK)));
+        }
+        startActivity(intent);
 
     }
 
@@ -175,7 +175,7 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+    public void onLoadFinished(@NotNull Loader<Cursor> cursorLoader, @NotNull Cursor cursor) {
         switch (cursorLoader.getId()) {
             case LOADER_ID:
                 mAdapter = new SoundsListCursorAdapter(getActivity(), cursor, 0);

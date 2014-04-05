@@ -70,22 +70,23 @@ public class MainActivity extends BaseActivity implements
                         new String[]{
                                 getString(R.string.title_section_songlist),
                                 getString(R.string.title_section_downloaded),
-                        }),
-                this);
+                        }
+                ),
+                this
+        );
 
-       retreiveSongList();
+        retreiveSongList();
 
     }
 
 
-    private void retreiveSongList(){
+    private void retreiveSongList() {
         //TODO:TEST METHOOD
         ProgressDialogFragment progress = new ProgressDialogFragment();
         progress.show(getSupportFragmentManager(), PROGRESS_DIALOG);
 
         requestId = getServiceHelper().getSongListAction();
     }
-
 
 
     @Override
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity implements
     }
 
     @Override
-    public void onServiceCallBack(int requestId, Intent requestIntent, int resultCode, @NotNull Bundle resultData) {
+    public void onServiceCallBack(int requestId, @NotNull Intent requestIntent, int resultCode, @NotNull Bundle resultData) {
         super.onServiceCallBack(requestId, requestIntent, resultCode, resultData);
 
         if (getServiceHelper().check(requestIntent, GetSongListCommand.class)) {
@@ -130,7 +131,7 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        
+
     }
 
     public static class ProgressDialogFragment extends DialogFragment {
@@ -166,7 +167,6 @@ public class MainActivity extends BaseActivity implements
     }
 
 
-
     @Override
     public void onSaveInstanceState(@NotNull Bundle outState) {
         // Serialize the current dropdown position.
@@ -191,7 +191,7 @@ public class MainActivity extends BaseActivity implements
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == R.id.action_reload){
+        } else if (id == R.id.action_reload) {
             retreiveSongList();
         }
         return super.onOptionsItemSelected(item);
@@ -243,9 +243,11 @@ public class MainActivity extends BaseActivity implements
 
 
     }
+
     public void cancelCommand() {
         getServiceHelper().cancelCommand(requestId);
     }
+
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);

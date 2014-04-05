@@ -29,6 +29,7 @@ import ru.eternalkaif.soundsofnature.service.MusicService;
 
 public class PlayerActivity extends BaseActivity {
 
+    @Nullable
     private String url;
 
     @Override
@@ -70,33 +71,28 @@ public class PlayerActivity extends BaseActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public static class PlaceholderFragment extends Fragment implements View.OnClickListener, View.OnTouchListener, MediaPlayer.OnBufferingUpdateListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
+    public static class PlaceholderFragment extends Fragment implements View.OnClickListener,
+            View.OnTouchListener,
+            MediaPlayer.OnCompletionListener,
+            MediaPlayer.OnErrorListener {
 
-        private static final String SONGURL = "songurl";
         public static final String TAG = "mediaplayer";
+        private static final String SONGURL = "songurl";
+        private static final long EVERY_SECOND = 1000;
+        private final Handler handler = new Handler();
         private Button buttonPlayPause;
         private SeekBar seekBarProgress;
         private MediaPlayer mp;
-
         private int mediaFileLengthInMilliseconds;
-
-        private final Handler handler = new Handler();
+        @Nullable
         private String url;
         private boolean mBound;
         private MusicService mService;
-
-        public static PlaceholderFragment newInstance(String url) {
-            PlaceholderFragment pf = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putString(SONGURL, url);
-            pf.setArguments(args);
-            return pf;
-        }
-
+        @NotNull
         private ServiceConnection mConnecion = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                Log.d(TAG,"service connected");
+                Log.d(TAG, "service connected");
                 MusicService.LocalBinder binder = (MusicService.LocalBinder) iBinder;
                 mService = binder.getService();
                 mService.play(url);
@@ -108,7 +104,16 @@ public class PlayerActivity extends BaseActivity {
                 mBound = false;
             }
         };
+        private boolean isPaused;
 
+        @NotNull
+        public static PlaceholderFragment newInstance(String url) {
+            PlaceholderFragment pf = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putString(SONGURL, url);
+            pf.setArguments(args);
+            return pf;
+        }
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -128,7 +133,6 @@ public class PlayerActivity extends BaseActivity {
 
 
         }
-
 
         @Nullable
         @Override
@@ -162,26 +166,12 @@ public class PlayerActivity extends BaseActivity {
 //            mediaFileLengthInMilliseconds = mp.getDuration();
 //            mp.start();
 //            Log.d(TAG, "Media player started on link " + url);
-//            primarySeekBarProgressUpdater();
 
             return rootView;
         }
 
-
-        private void primarySeekBarProgressUpdater() {
-            seekBarProgress.setProgress((int) (((float) mp.getCurrentPosition() / mediaFileLengthInMilliseconds) * 100)); // This math construction give a percentage of "was playing"/"song length"
-            if (mp.isPlaying()) {
-                Runnable notification = new Runnable() {
-                    public void run() {
-                        primarySeekBarProgressUpdater();
-                    }
-                };
-                handler.postDelayed(notification, 1000);
-            }
-        }
-
         @Override
-        public void onClick(View view) {
+        public void onClick(@NotNull View view) {
             if (view.getId() == R.id.btn_playpause) {
                 if (mService.isPlaying()) {
                     mService.pause();
@@ -198,7 +188,7 @@ public class PlayerActivity extends BaseActivity {
         }
 
         @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
+        public boolean onTouch(@NotNull View view, MotionEvent motionEvent) {
             if (view.getId() == R.id.seekBar) {
                 if (mp.isPlaying()) {
                     SeekBar seekBar = (SeekBar) view;
@@ -212,6 +202,15 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onPause() {
             super.onPause();
+            isPaused = true;
+            handler.removeCallbacks(onEverySecond);
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            isPaused = false;
+            handler.postDelayed(onEverySecond, EVERY_SECOND);
         }
 
         @Override
@@ -224,20 +223,31 @@ public class PlayerActivity extends BaseActivity {
         }
 
         @Override
-        public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
-            seekBarProgress.setSecondaryProgress(i);
-        }
-
-        @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
 
         }
+
+        Runnable onEverySecond = new Runnable() {
+            @Override
+            public void run() {
+                if (mService != null) {
+                    seekBarProgress.setProgress(mService.getProgress());
+                    seekBarProgress.setSecondaryProgress(mService.getSecondaryProgress());
+                    handler.postDelayed(onEverySecond, 1000);
+                } else {
+                    seekBarProgress.setProgress(0);
+                }
+                Log.d(TAG, "Progress checking");
+            }
+        };
 
         @Override
         public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
             Toast.makeText(getActivity(), "MediaPlayer Error (" + i + "," + i2 + ")", Toast.LENGTH_SHORT).show();
             return false;
         }
+
+
     }
 
 }
