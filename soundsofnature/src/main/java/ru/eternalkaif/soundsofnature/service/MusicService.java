@@ -153,7 +153,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
         }
     }
-
     public int getProgress() {
         int progress = 0;
         if (getMp().isPlaying()) {
@@ -166,6 +165,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     }
 
     public int getSecondaryProgress() {
+        Log.d(TAG, "secondary progress " + bufferProgress);
         return bufferProgress;
     }
 

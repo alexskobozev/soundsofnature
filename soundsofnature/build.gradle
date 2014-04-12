@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion '19.0.1'
+    buildToolsVersion '19.0.3'
 
     defaultConfig {
         minSdkVersion 11
@@ -24,35 +24,16 @@ android {
     }
 }
 
-sourceSets {
-    unitTest {
-        java.srcDir file('src/test/java')
-        resources.srcDir file('src/test/res')
-    }
-}
 
-configurations {
-    unitTestCompile.extendsFrom runtime
-    unitTestRuntime.extendsFrom unitTestCompile
-}
 
 dependencies {
     repositories {
         mavenCentral()
     }
-    compile 'com.android.support:support-v4:19.0.1'
-    compile 'com.android.support:appcompat-v7:19.0.1'
+    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:appcompat-v7:19.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
     compile 'com.loopj.android:android-async-http:1.4.4@jar'
 
-    unitTestCompile  files("$project.buildDir/classes/release")
-    unitTestCompile  'junit:junit:4.10'
-    unitTestCompile  'org.robolectric:robolectric:2.1.+'
-    unitTestCompile  'com.google.android:android:4.0.1.2'
 }
 
-task unitTest(type:Test, dependsOn: assemble) {
-    testClassesDir = project.sourceSets.unitTest.output.classesDir
-    classpath = project.sourceSets.unitTest.runtimeClasspath
-}
-check.dependsOn unitTest
