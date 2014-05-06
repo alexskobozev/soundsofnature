@@ -2,8 +2,10 @@ package ru.eternalkaif.soundsofnature.service;
 
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -12,6 +14,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -30,6 +33,8 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     public static final String SONG_NAME = "songname";
     public static final String ACTION_PLAY = "START_PLAY";
     private static final String TAG = "MusicService";
+    private static final String PLAYSONG = "playsong";
+    private static final String ACTION_PAUSE = "action_pause";
     private final IBinder mBinder = new LocalBinder();
     int progress;
     int secondaryProgress;
@@ -43,6 +48,8 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     private WifiManager.WifiLock wifiLock;
     private boolean mPrepared;
     private int bufferProgress;
+    private LocalBroadcastManager mLocalBroadcastManager;
+    private BroadcastReceiver broadcastReceiver;
 
     public MusicService() {
     }
@@ -80,9 +87,29 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                 }
             }
 
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        broadcastReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+
+
+                if (intent.getAction().equals(ACTION_PLAY)) {
+                    url = intent.getExtras().getString(PLAYSONG);
+                    Log.d(TAG, "received " + " intent action = " + intent.getAction() + " URL = " + url);
+                    play(intent.getExtras().getString(SONG_URL));
+                    getMp().pause();
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_PLAY);
+        mLocalBroadcastManager.registerReceiver(broadcastReceiver, filter);
 
         return Service.START_STICKY;
     }
+
 
     public boolean isPlaying() {
         return mPrepared && getMp().isPlaying();
@@ -153,6 +180,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
         }
     }
+
     public int getProgress() {
         int progress = 0;
         if (getMp().isPlaying()) {
@@ -187,6 +215,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         super.onDestroy();
+
         stop();
     }
 
@@ -209,4 +238,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
             return MusicService.this;
         }
     }
+
+
 }

@@ -1,14 +1,11 @@
 package ru.eternalkaif.soundsofnature.activities;
 
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
+import ru.eternalkaif.soundsofnature.Utils;
 import ru.eternalkaif.soundsofnature.service.MusicService;
 
 public class PlayerActivity extends BaseActivity {
@@ -77,7 +75,7 @@ public class PlayerActivity extends BaseActivity {
             MediaPlayer.OnErrorListener {
 
         public static final String TAG = "mediaplayer";
-        private static final String SONGURL = "songurl";
+        public static final String SONGURL = "songurl";
         private static final long EVERY_SECOND = 1000;
         private final Handler handler = new Handler();
         private Button buttonPlayPause;
@@ -89,25 +87,13 @@ public class PlayerActivity extends BaseActivity {
         private boolean mBound;
         private MusicService mService;
         @NotNull
-        private ServiceConnection mConnecion = new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-                Log.d(TAG, "service connected");
-                MusicService.LocalBinder binder = (MusicService.LocalBinder) iBinder;
-                mService = binder.getService();
-                mService.play(url);
-                mBound = true;
-            }
 
-            @Override
-            public void onServiceDisconnected(ComponentName componentName) {
-                mBound = false;
-            }
-        };
         private boolean isPaused;
+        private LocalBroadcastManager mLocalBroadcastManager;
 
         @NotNull
         public static PlaceholderFragment newInstance(String url) {
+
             PlaceholderFragment pf = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putString(SONGURL, url);
@@ -118,8 +104,12 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            mLocalBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
             if (getArguments() != null) {
                 url = getArguments().getString(SONGURL);
+                Intent broadcastIntent = new Intent(MusicService.ACTION_PLAY);
+                broadcastIntent.putExtra(MusicService.SONG_URL, url);
+                mLocalBroadcastManager.sendBroadcast(broadcastIntent);
             }
 
 
@@ -128,8 +118,11 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onStart() {
             super.onStart();
-            Intent intent = new Intent(getActivity(), MusicService.class);
-            getActivity().bindService(intent, mConnecion, Context.BIND_AUTO_CREATE);
+                Intent intent = new Intent(getActivity(), MusicService.class);
+                intent.setAction(MusicService.ACTION_PLAY);
+                intent.putExtra(MusicService.SONG_URL, url);
+                getActivity().startService(intent);
+//            getActivity().bindService(intent, mConnecion, Context.BIND_AUTO_CREATE);
 
 
         }
@@ -147,6 +140,8 @@ public class PlayerActivity extends BaseActivity {
             Log.d(TAG, "callings service getArgs " + getArguments() + " mBound " + mBound);
 
             if (getArguments() != null) {
+
+
                 if (mBound) {
                     mService.play(url);
                 }
@@ -173,11 +168,16 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onClick(@NotNull View view) {
             if (view.getId() == R.id.btn_playpause) {
-                if (mService.isPlaying()) {
-                    mService.pause();
-                } else {
-                    mService.resumePlay();
-                }
+                Intent broadcastIntent = new Intent(MusicService.ACTION_PLAY);
+                broadcastIntent.putExtra(SONGURL, url);
+                mLocalBroadcastManager.sendBroadcast(broadcastIntent);
+//                if (mService.isPlaying()) {
+//
+//
+//                    mService.pause();
+//                } else {
+//                    mService.resumePlay();
+//                }
 //                if (!mp.isPlaying()) {
 //                    mp.start();
 //                } else {
@@ -204,6 +204,7 @@ public class PlayerActivity extends BaseActivity {
             super.onPause();
             isPaused = true;
             handler.removeCallbacks(onEverySecond);
+
         }
 
         @Override
@@ -249,5 +250,6 @@ public class PlayerActivity extends BaseActivity {
 
 
     }
+
 
 }
