@@ -235,8 +235,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-
-        // Pause/resume action
         Intent pauseIntent = new Intent(this, MusicService.class);
         pauseIntent.setAction(ACTION_PAUSE);
         pauseIntent.putExtra(ACTION_PAUSE, new ResultReceiver(new Handler()) {
@@ -274,7 +272,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         PendingIntent ppauseIntent = PendingIntent.getService(this, 0,
                 pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         contentView.setOnClickPendingIntent(R.id.btn_pause, ppauseIntent);
-
 
         return notificationCompat;
     }
