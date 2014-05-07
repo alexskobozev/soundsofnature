@@ -161,6 +161,9 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
             intent.putExtra(MusicService.SONG_URL, cursor.getString(cursor
                     .getColumnIndexOrThrow(SoundsDataBaseContract
                             .Sounds.NamesColoumns.SOUNDMP3LINK)));
+            intent.putExtra(MusicService.SONG_NAME, cursor.getString(cursor
+                    .getColumnIndexOrThrow(SoundsDataBaseContract
+                            .Sounds.NamesColoumns.SOUNDTITLE)));
         }
         startActivity(intent);
 

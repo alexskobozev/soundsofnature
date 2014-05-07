@@ -27,14 +27,19 @@ import ru.eternalkaif.soundsofnature.service.MusicService;
 public class PlayerActivity extends BaseActivity {
 
 
+    private String soundUrl;
+    private String soundName;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         Bundle b = getIntent().getExtras();
+        soundUrl = b.getString(MusicService.SONG_URL);
+        soundName = b.getString(MusicService.SONG_NAME);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, PlaceholderFragment.newInstance())
+                    .add(R.id.container, PlaceholderFragment.newInstance(soundUrl, soundName))
                     .commit();
         }
     }
@@ -81,11 +86,17 @@ public class PlayerActivity extends BaseActivity {
 
         private boolean isPaused;
         private LocalBroadcastManager mLocalBroadcastManager;
+        private String songUrl;
+        private String songName;
 
         @NotNull
-        public static PlaceholderFragment newInstance() {
+        public static PlaceholderFragment newInstance(String soundUrl, String soundName) {
 
             PlaceholderFragment pf = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putString(MusicService.SONG_URL, soundUrl);
+            args.putString(MusicService.SONG_NAME, soundName);
+            pf.setArguments(args);
             return pf;
         }
 
@@ -93,9 +104,13 @@ public class PlayerActivity extends BaseActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             mLocalBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
+
             if (getArguments() != null) {
                 Intent broadcastIntent = new Intent(MusicService.ACTION_PLAY);
                 mLocalBroadcastManager.sendBroadcast(broadcastIntent);
+                songUrl = getArguments().getString(MusicService.SONG_URL);
+                songName = getArguments().getString(MusicService.SONG_NAME);
+
             }
 
 
@@ -151,7 +166,13 @@ public class PlayerActivity extends BaseActivity {
             if (view.getId() == R.id.btn_playpause) {
 
                 Intent pauseIntent;
-                if (MusicService.getInstance().isPlaying()) {
+                if (!MusicService.getInstance().isPrepared()) {
+                    Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+                    serviceIntent.setAction(MusicService.ACTION_PLAY);
+                    serviceIntent.putExtra(MusicService.SONG_URL, songUrl);
+                    getActivity().startService(serviceIntent);
+
+                } else if (MusicService.getInstance().isPlaying()) {
                     pauseIntent = new Intent(MusicService.ACTION_PAUSE);
                     mLocalBroadcastManager.sendBroadcast(pauseIntent);
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
