@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import ru.eternalkaif.soundsofnature.BaseActivity;
 import ru.eternalkaif.soundsofnature.R;
-import ru.eternalkaif.soundsofnature.Utils;
 import ru.eternalkaif.soundsofnature.service.MusicService;
 
 public class PlayerActivity extends BaseActivity {
@@ -118,10 +117,10 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onStart() {
             super.onStart();
-                Intent intent = new Intent(getActivity(), MusicService.class);
-                intent.setAction(MusicService.ACTION_PLAY);
-                intent.putExtra(MusicService.SONG_URL, url);
-                getActivity().startService(intent);
+            Intent intent = new Intent(getActivity(), MusicService.class);
+            intent.setAction(MusicService.ACTION_PLAY);
+            intent.putExtra(MusicService.SONG_URL, url);
+            getActivity().startService(intent);
 //            getActivity().bindService(intent, mConnecion, Context.BIND_AUTO_CREATE);
 
 
@@ -139,17 +138,17 @@ public class PlayerActivity extends BaseActivity {
             seekBarProgress.setOnTouchListener(this);
             Log.d(TAG, "callings service getArgs " + getArguments() + " mBound " + mBound);
 
-            if (getArguments() != null) {
+//            if (getArguments() != null) {
 
 
-                if (mBound) {
-                    mService.play(url);
-                }
+//                if (mBound) {
+//                    mService.play(url);
+//                }
 //                Intent intent = new Intent(getActivity(), MusicService.class);
 //                intent.setAction(MusicService.ACTION_PLAY);
 //                intent.putExtra(MusicService.SONG_URL, url);
 //                getActivity().startService(intent);
-            }
+//            }
             //  mp = MediaPlayer.create(getActivity(), Uri.parse(url));
 //            mp = new MediaPlayer();
 //
@@ -168,22 +167,18 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onClick(@NotNull View view) {
             if (view.getId() == R.id.btn_playpause) {
-                Intent broadcastIntent = new Intent(MusicService.ACTION_PLAY);
-                broadcastIntent.putExtra(SONGURL, url);
-                mLocalBroadcastManager.sendBroadcast(broadcastIntent);
-//                if (mService.isPlaying()) {
-//
-//
-//                    mService.pause();
-//                } else {
-//                    mService.resumePlay();
-//                }
-//                if (!mp.isPlaying()) {
-//                    mp.start();
-//                } else {
-//                    mp.pause();
-//                }
 
+                Intent pauseIntent;
+                if (MusicService.getInstance().isPlaying()) {
+                    pauseIntent = new Intent(MusicService.ACTION_PAUSE);
+                    mLocalBroadcastManager.sendBroadcast(pauseIntent);
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
+                } else {
+                    pauseIntent = new Intent(MusicService.ACTION_RESUME);
+                    pauseIntent.putExtra(SONGURL, url);
+                    mLocalBroadcastManager.sendBroadcast(pauseIntent);
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+                }
             }
         }
 
@@ -211,6 +206,12 @@ public class PlayerActivity extends BaseActivity {
         public void onResume() {
             super.onResume();
             isPaused = false;
+            if (MusicService.getInstance() != null)
+                if (MusicService.getInstance().isPlaying()) {
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+                } else {
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
+                }
             handler.postDelayed(onEverySecond, EVERY_SECOND);
         }
 

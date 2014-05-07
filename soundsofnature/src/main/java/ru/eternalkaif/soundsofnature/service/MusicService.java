@@ -31,10 +31,11 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         MediaPlayer.OnBufferingUpdateListener {
     public static final String SONG_URL = "songurl";
     public static final String SONG_NAME = "songname";
-    public static final String ACTION_PLAY = "START_PLAY";
+    public static final String ACTION_PLAY = "action_play";
     private static final String TAG = "MusicService";
     private static final String PLAYSONG = "playsong";
-    private static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_RESUME = "action_resume";
     private final IBinder mBinder = new LocalBinder();
     int progress;
     int secondaryProgress;
@@ -50,8 +51,15 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     private int bufferProgress;
     private LocalBroadcastManager mLocalBroadcastManager;
     private BroadcastReceiver broadcastReceiver;
+    private static MusicService musicService;
+    private boolean isPaused = false;
 
     public MusicService() {
+        musicService = this;
+    }
+
+    public static MusicService getInstance() {
+        return musicService;
     }
 
     @Override
@@ -98,13 +106,28 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                     url = intent.getExtras().getString(PLAYSONG);
                     Log.d(TAG, "received " + " intent action = " + intent.getAction() + " URL = " + url);
                     play(intent.getExtras().getString(SONG_URL));
-                    getMp().pause();
+                    // getMp().pause();
+                }
+
+                if (intent.getAction().equals(ACTION_PAUSE)) {
+                    Log.d(TAG, "received " + " intent action = " + intent.getAction() + " URL = " + url);
+                    if (isPlaying) {
+                        pause();
+                    }
+
+                }
+                if (intent.getAction().equals(ACTION_RESUME)) {
+                    Log.d(TAG, "received " + " intent action = " + intent.getAction() + " URL = " + url);
+                    resumePlay();
+
                 }
             }
         };
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_PLAY);
+        filter.addAction(ACTION_PAUSE);
+        filter.addAction(ACTION_RESUME);
         mLocalBroadcastManager.registerReceiver(broadcastReceiver, filter);
 
         return Service.START_STICKY;
@@ -117,11 +140,13 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
     public void pause() {
         Log.d(TAG, "pause");
+        isPaused = true;
         getMp().pause();
     }
 
     public void resumePlay() {
         Log.d(TAG, "resumePlay");
+        isPaused = false;
         if (mPrepared) {
             getMp().start();
         } else play(url);
@@ -169,7 +194,6 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                 mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
                 mediaPlayer.setOnPreparedListener(this);
                 mediaPlayer.setOnBufferingUpdateListener(this);
-
                 mediaPlayer.prepareAsync();
             } catch (IOException e) {
                 e.printStackTrace();
