@@ -11,8 +11,11 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -36,6 +39,9 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     private static final String PLAYSONG = "playsong";
     public static final String ACTION_PAUSE = "action_pause";
     public static final String ACTION_RESUME = "action_resume";
+    private static final String SHTORKA_ACTION = "notification_action";
+    private static final int RESULT_CODE_PAUSE = 1;
+    private static final int RESULT_CODE_PLAY = 2;
     private final IBinder mBinder = new LocalBinder();
     int progress;
     int secondaryProgress;
@@ -86,6 +92,21 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                 .createWifiLock(WifiManager.WIFI_MODE_FULL, "mylock");
         if (intent != null)
             if (intent.getAction() != null) {
+                if (intent.getAction().equals(ACTION_PAUSE)) {
+                    Intent pauseIntent;
+                    if (MusicService.getInstance().isPlaying()) {
+                        pauseIntent = new Intent(MusicService.ACTION_PAUSE);
+                        mLocalBroadcastManager.sendBroadcast(pauseIntent);
+                        ResultReceiver r = intent.getParcelableExtra(ACTION_PAUSE);
+                        r.send(RESULT_CODE_PAUSE, null);
+                    } else {
+                        pauseIntent = new Intent(MusicService.ACTION_RESUME);
+                        mLocalBroadcastManager.sendBroadcast(pauseIntent);
+                        ResultReceiver r = intent.getParcelableExtra(ACTION_PAUSE);
+                        r.send(RESULT_CODE_PLAY, null);
+                    }
+                }
+
                 if (intent.getExtras() != null) {
                     url = intent.getStringExtra(SONG_URL);
                     songName = intent.getStringExtra(SONG_NAME);
@@ -178,24 +199,12 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         Log.d(TAG, "play");
         if (!isPlaying) {
             isPlaying = true;
-            Intent intent = new Intent(this, PlayerActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
-            RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+            final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
             contentView.setTextViewText(R.id.tv_action_name, getResources().getString(R.string.music_player));
             contentView.setTextViewText(R.id.songName, songName);
-
-            NotificationCompat.Builder notificationCompat = new NotificationCompat.Builder(
-                    getApplicationContext());
-            notificationCompat
-                    .setContentTitle(getResources().getString(R.string.music_player))
-                    .setContentText(songName)
-                    .setSmallIcon(R.drawable.ic_launcher)
-                    .setContentIntent(pendingIntent)
-                    .setContent(contentView);
+            contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_pause_dark);
 
 
             mediaPlayer = new MediaPlayer();
@@ -210,10 +219,55 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                 e.printStackTrace();
             }
             wifiLock.acquire();
-            startForeground(123, notificationCompat.build());
+
+            startForeground(123, initNotification(contentView).build());
 
 
         }
+    }
+
+    public NotificationCompat.Builder initNotification(final RemoteViews contentView) {
+
+
+        Intent intent = new Intent(this, PlayerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        Intent pauseIntent = new Intent(this, MusicService.class);
+        pauseIntent.setAction(ACTION_PAUSE);
+        pauseIntent.putExtra(ACTION_PAUSE, new ResultReceiver(new Handler()) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                //TODO: change notification icon
+                super.onReceiveResult(resultCode, resultData);
+                if (resultCode == 1) {
+                    contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_play_dark);
+                    initNotification(contentView);
+                    startForeground(123, initNotification(contentView).build());
+                } else if (resultCode == 2) {
+                    contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_pause_dark);
+                    initNotification(contentView);
+                    startForeground(123, initNotification(contentView).build());
+                }
+            }
+        });
+
+
+        NotificationCompat.Builder notificationCompat = new NotificationCompat.Builder(
+                getApplicationContext());
+        notificationCompat
+                .setContentTitle(getResources().getString(R.string.music_player))
+                .setContentText(songName)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pendingIntent)
+                .setContent(contentView);
+        PendingIntent ppauseIntent = PendingIntent.getService(this, 0,
+                pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.btn_pause, ppauseIntent);
+
+        return notificationCompat;
     }
 
     public int getProgress() {
