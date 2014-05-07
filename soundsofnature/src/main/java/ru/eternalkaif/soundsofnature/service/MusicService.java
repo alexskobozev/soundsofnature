@@ -90,9 +90,16 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                     url = intent.getStringExtra(SONG_URL);
                     songName = intent.getStringExtra(SONG_NAME);
                     if (intent.getAction().equals(ACTION_PLAY)) {
+                        Log.d(TAG, "Started playing " + url);
                         play(url);
+                    } else {
+                        Log.d(TAG, "Started playing, but action isnt action_play ");
                     }
+                } else {
+                    Log.d(TAG, "Started playing, but intent.getExtras = null ");
                 }
+            } else {
+                Log.d(TAG, "Started playing, but intent.getAction = null ");
             }
 
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -136,6 +143,10 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
     public boolean isPlaying() {
         return mPrepared && getMp().isPlaying();
+    }
+
+    public boolean isPrepared() {
+        return mPrepared;
     }
 
     public void pause() {
@@ -221,8 +232,20 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         return bufferProgress;
     }
 
-
     public void stop() {
+
+        if (isPlaying) {
+            isPlaying = false;
+            if (mediaPlayer != null) {
+                mediaPlayer.release();
+                mediaPlayer = null;
+            }
+            stopForeground(true);
+            mPrepared = false;
+        }
+    }
+
+    public void kill() {
         if (isPlaying) {
             isPlaying = false;
             if (mediaPlayer != null) {
@@ -240,7 +263,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         Log.d(TAG, "onDestroy");
         super.onDestroy();
 
-        stop();
+        kill();
     }
 
     @Override

@@ -26,6 +26,7 @@ import ru.eternalkaif.soundsofnature.adapters.SoundsListCursorAdapter;
 import ru.eternalkaif.soundsofnature.db.SoundsDataBaseContract;
 import ru.eternalkaif.soundsofnature.db.SoundsProvider;
 import ru.eternalkaif.soundsofnature.listeners.OnFragmentInteractionListener;
+import ru.eternalkaif.soundsofnature.service.MusicService;
 
 /**
  * A fragment representing a list of Items.
@@ -144,9 +145,20 @@ public class MainListFragment extends ListFragment implements AbsListView.OnItem
         Intent intent = new Intent(getActivity(), PlayerActivity.class);
         Cursor cursor = mAdapter.getCursor();
         if (cursor.moveToPosition(position)) {
+            if (MusicService.getInstance() != null)
+                if (MusicService.getInstance().isPlaying()) {
+                    MusicService.getInstance().stop();
+                }
             Log.d("ITEMCLICK", cursor.toString() + "");
+            Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+            serviceIntent.setAction(MusicService.ACTION_PLAY);
+            serviceIntent.putExtra(MusicService.SONG_URL, cursor.getString(cursor
+                    .getColumnIndexOrThrow(SoundsDataBaseContract
+                            .Sounds.NamesColoumns.SOUNDMP3LINK)));
+            getActivity().startService(serviceIntent);
 
-            intent.putExtra("songurl", cursor.getString(cursor
+
+            intent.putExtra(MusicService.SONG_URL, cursor.getString(cursor
                     .getColumnIndexOrThrow(SoundsDataBaseContract
                             .Sounds.NamesColoumns.SOUNDMP3LINK)));
         }

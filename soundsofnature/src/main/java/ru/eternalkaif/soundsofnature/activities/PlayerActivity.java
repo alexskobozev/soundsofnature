@@ -26,20 +26,15 @@ import ru.eternalkaif.soundsofnature.service.MusicService;
 
 public class PlayerActivity extends BaseActivity {
 
-    @Nullable
-    private String url;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         Bundle b = getIntent().getExtras();
-        if (b != null) {
-            url = b.getString("songurl");
-        }
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, PlaceholderFragment.newInstance(url))
+                    .add(R.id.container, PlaceholderFragment.newInstance())
                     .commit();
         }
     }
@@ -81,22 +76,16 @@ public class PlayerActivity extends BaseActivity {
         private SeekBar seekBarProgress;
         private MediaPlayer mp;
         private int mediaFileLengthInMilliseconds;
-        @Nullable
-        private String url;
         private boolean mBound;
         private MusicService mService;
-        @NotNull
 
         private boolean isPaused;
         private LocalBroadcastManager mLocalBroadcastManager;
 
         @NotNull
-        public static PlaceholderFragment newInstance(String url) {
+        public static PlaceholderFragment newInstance() {
 
             PlaceholderFragment pf = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putString(SONGURL, url);
-            pf.setArguments(args);
             return pf;
         }
 
@@ -105,9 +94,7 @@ public class PlayerActivity extends BaseActivity {
             super.onCreate(savedInstanceState);
             mLocalBroadcastManager = LocalBroadcastManager.getInstance(getActivity());
             if (getArguments() != null) {
-                url = getArguments().getString(SONGURL);
                 Intent broadcastIntent = new Intent(MusicService.ACTION_PLAY);
-                broadcastIntent.putExtra(MusicService.SONG_URL, url);
                 mLocalBroadcastManager.sendBroadcast(broadcastIntent);
             }
 
@@ -117,11 +104,6 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public void onStart() {
             super.onStart();
-            Intent intent = new Intent(getActivity(), MusicService.class);
-            intent.setAction(MusicService.ACTION_PLAY);
-            intent.putExtra(MusicService.SONG_URL, url);
-            getActivity().startService(intent);
-//            getActivity().bindService(intent, mConnecion, Context.BIND_AUTO_CREATE);
 
 
         }
@@ -175,7 +157,6 @@ public class PlayerActivity extends BaseActivity {
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
                 } else {
                     pauseIntent = new Intent(MusicService.ACTION_RESUME);
-                    pauseIntent.putExtra(SONGURL, url);
                     mLocalBroadcastManager.sendBroadcast(pauseIntent);
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
                 }
