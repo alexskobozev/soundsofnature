@@ -1,6 +1,9 @@
 package ru.eternalkaif.soundsofnature.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -88,6 +91,8 @@ public class PlayerActivity extends BaseActivity {
         private LocalBroadcastManager mLocalBroadcastManager;
         private String songUrl;
         private String songName;
+        private BroadcastReceiver broadcastReceiver;
+        private IntentFilter filter;
 
         @NotNull
         public static PlaceholderFragment newInstance(String soundUrl, String soundName) {
@@ -114,6 +119,36 @@ public class PlayerActivity extends BaseActivity {
             }
 
 
+            broadcastReceiver = new BroadcastReceiver() {
+
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    if (intent.getAction() != null) {
+
+                        if (intent.getAction().equals(MusicService.ACTION_PLAY)) {
+                            buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+
+                        }
+
+                        if (intent.getAction().equals(MusicService.ACTION_PAUSE)) {
+                            buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
+
+
+                        }
+                        if (intent.getAction().equals(MusicService.ACTION_RESUME)) {
+                            buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+
+                        }
+                    }
+                }
+            };
+
+            filter = new IntentFilter();
+            filter.addAction(MusicService.ACTION_PLAY);
+            filter.addAction(MusicService.ACTION_PAUSE);
+            filter.addAction(MusicService.ACTION_RESUME);
+
+
         }
 
         @Override
@@ -134,30 +169,11 @@ public class PlayerActivity extends BaseActivity {
             seekBarProgress = (SeekBar) rootView.findViewById(R.id.seekBar);
             seekBarProgress.setOnTouchListener(this);
             Log.d(TAG, "callings service getArgs " + getArguments() + " mBound " + mBound);
-
-//            if (getArguments() != null) {
-
-
-//                if (mBound) {
-//                    mService.play(url);
-//                }
-//                Intent intent = new Intent(getActivity(), MusicService.class);
-//                intent.setAction(MusicService.ACTION_PLAY);
-//                intent.putExtra(MusicService.SONG_URL, url);
-//                getActivity().startService(intent);
-//            }
-            //  mp = MediaPlayer.create(getActivity(), Uri.parse(url));
-//            mp = new MediaPlayer();
-//
-//
-//            mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-//            mp.setOnBufferingUpdateListener(this);
-//            mp.setOnCompletionListener(this);
-//            mp.setOnErrorListener(this);
-//            mediaFileLengthInMilliseconds = mp.getDuration();
-//            mp.start();
-//            Log.d(TAG, "Media player started on link " + url);
-
+            if (MusicService.getInstance().isPaused()) {
+                buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
+            } else {
+                buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+            }
             return rootView;
         }
 
@@ -171,14 +187,21 @@ public class PlayerActivity extends BaseActivity {
                     serviceIntent.setAction(MusicService.ACTION_PLAY);
                     serviceIntent.putExtra(MusicService.SONG_URL, songUrl);
                     getActivity().startService(serviceIntent);
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
 
                 } else if (MusicService.getInstance().isPlaying()) {
                     pauseIntent = new Intent(MusicService.ACTION_PAUSE);
                     mLocalBroadcastManager.sendBroadcast(pauseIntent);
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
-                } else {
+                } else if (MusicService.getInstance().isPaused()) {
                     pauseIntent = new Intent(MusicService.ACTION_RESUME);
                     mLocalBroadcastManager.sendBroadcast(pauseIntent);
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
+                } else {
+                    Intent serviceIntent = new Intent(getActivity(), MusicService.class);
+                    serviceIntent.setAction(MusicService.ACTION_PLAY);
+                    serviceIntent.putExtra(MusicService.SONG_URL, songUrl);
+                    getActivity().startService(serviceIntent);
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
                 }
             }
@@ -201,7 +224,7 @@ public class PlayerActivity extends BaseActivity {
             super.onPause();
             isPaused = true;
             handler.removeCallbacks(onEverySecond);
-
+            mLocalBroadcastManager.unregisterReceiver(broadcastReceiver);
         }
 
         @Override
@@ -209,21 +232,18 @@ public class PlayerActivity extends BaseActivity {
             super.onResume();
             isPaused = false;
             if (MusicService.getInstance() != null)
-                if (MusicService.getInstance().isPlaying()) {
-                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
-                } else {
+                if (MusicService.getInstance().isPaused()) {
                     buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
+                } else {
+                    buttonPlayPause.setBackgroundResource(R.drawable.ic_pause);
                 }
             handler.postDelayed(onEverySecond, EVERY_SECOND);
+            mLocalBroadcastManager.registerReceiver(broadcastReceiver, filter);
         }
 
         @Override
         public void onStop() {
             super.onStop();
-//            if (mBound) {
-//                getActivity().unbindService(mConnecion);
-//                mBound = false;
-//            }
         }
 
         @Override

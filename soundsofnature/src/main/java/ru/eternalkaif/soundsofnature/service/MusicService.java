@@ -1,5 +1,6 @@
 package ru.eternalkaif.soundsofnature.service;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -58,7 +59,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     private LocalBroadcastManager mLocalBroadcastManager;
     private BroadcastReceiver broadcastReceiver;
     private static MusicService musicService;
-    private boolean isPaused = false;
+    private boolean mPaused = false;
 
     public MusicService() {
         musicService = this;
@@ -90,19 +91,22 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         if (intent != null)
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(ACTION_KILL)) {
+                    Log.d(TAG, "Notification command: kill");
                     kill();
                 }
                 if (intent.getAction().equals(ACTION_PAUSE)) {
                     Intent pauseIntent;
-                    if (MusicService.getInstance().isPlaying()) {
+                    if (isPlaying()) {
                         pauseIntent = new Intent(MusicService.ACTION_PAUSE);
                         mLocalBroadcastManager.sendBroadcast(pauseIntent);
                         ResultReceiver r = intent.getParcelableExtra(ACTION_PAUSE);
+                        Log.d(TAG, "Notification command: pause");
                         r.send(RESULT_CODE_PAUSE, null);
                     } else {
                         pauseIntent = new Intent(MusicService.ACTION_RESUME);
                         mLocalBroadcastManager.sendBroadcast(pauseIntent);
                         ResultReceiver r = intent.getParcelableExtra(ACTION_PAUSE);
+                        Log.d(TAG, "Notification command: resume");
                         r.send(RESULT_CODE_PLAY, null);
                     }
                 }
@@ -111,7 +115,9 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                     url = intent.getStringExtra(SONG_URL);
                     songName = intent.getStringExtra(SONG_NAME);
                     if (intent.getAction().equals(ACTION_PLAY)) {
-                        Log.d(TAG, "Started playing " + url);
+                        if (isPaused())
+                            stop();
+                        Log.d(TAG, "Started playing " + songName + " url = " + url);
                         play(url);
                     } else {
                         Log.d(TAG, "Started playing, but action isnt action_play ");
@@ -133,6 +139,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
                 if (intent.getAction().equals(ACTION_PLAY)) {
                     //url = intent.getExtras().getString(PLAYSONG);
                     Log.d(TAG, "received " + " intent action = " + intent.getAction() + " URL = " + url);
+
                     play(url);
                     // getMp().pause();
                 }
@@ -164,24 +171,44 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
     public boolean isPlaying() {
         return mPrepared && getMp().isPlaying();
+
     }
 
     public boolean isPrepared() {
         return mPrepared;
     }
 
+    public boolean isPaused() {
+        return mPaused;
+    }
+
     public void pause() {
         Log.d(TAG, "pause");
-        isPaused = true;
+        mPaused = true;
         getMp().pause();
+
+        final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+        contentView.setTextViewText(R.id.tv_action_name, getResources().getString(R.string.music_player));
+        contentView.setTextViewText(R.id.songName, songName);
+        contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_play_dark);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(123, initNotification(contentView).build());
+       // startForeground(123, initNotification(contentView).build());
     }
 
     public void resumePlay() {
         Log.d(TAG, "resumePlay");
-        isPaused = false;
+        mPaused = false;
         if (mPrepared) {
             getMp().start();
         } else play(url);
+
+        final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
+        contentView.setTextViewText(R.id.tv_action_name, getResources().getString(R.string.music_player));
+        contentView.setTextViewText(R.id.songName, songName);
+        contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_pause_dark);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(123, initNotification(contentView).build());
     }
 
     /**
@@ -199,7 +226,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         Log.d(TAG, "play");
         if (!isPlaying) {
             isPlaying = true;
-
+            mPaused = false;
 
             final RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.custom_notification);
             contentView.setTextViewText(R.id.tv_action_name, getResources().getString(R.string.music_player));
