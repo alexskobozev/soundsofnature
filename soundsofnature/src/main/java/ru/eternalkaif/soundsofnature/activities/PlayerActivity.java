@@ -38,8 +38,8 @@ public class PlayerActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         Bundle b = getIntent().getExtras();
-        soundUrl = b.getString(MusicService.SONG_URL);
-        soundName = b.getString(MusicService.SONG_NAME);
+        soundUrl = b != null ? b.getString(MusicService.SONG_URL) : null;
+        soundName = b != null ? b.getString(MusicService.SONG_NAME) : null;
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, PlaceholderFragment.newInstance(soundUrl, soundName))
@@ -84,8 +84,6 @@ public class PlayerActivity extends BaseActivity {
         private SeekBar seekBarProgress;
         private MediaPlayer mp;
         private int mediaFileLengthInMilliseconds;
-        private boolean mBound;
-        private MusicService mService;
 
         private boolean isPaused;
         private LocalBroadcastManager mLocalBroadcastManager;
@@ -168,7 +166,7 @@ public class PlayerActivity extends BaseActivity {
 
             seekBarProgress = (SeekBar) rootView.findViewById(R.id.seekBar);
             seekBarProgress.setOnTouchListener(this);
-            Log.d(TAG, "callings service getArgs " + getArguments() + " mBound " + mBound);
+            Log.d(TAG, "callings service getArgs " + getArguments());
             if (MusicService.getInstance().isPaused()) {
                 buttonPlayPause.setBackgroundResource(R.drawable.ic_play);
             } else {
@@ -210,11 +208,9 @@ public class PlayerActivity extends BaseActivity {
         @Override
         public boolean onTouch(@NotNull View view, MotionEvent motionEvent) {
             if (view.getId() == R.id.seekBar) {
-                if (mp.isPlaying()) {
                     SeekBar seekBar = (SeekBar) view;
-                    int playPositionInMillisecconds = (mediaFileLengthInMilliseconds / 100) * seekBar.getProgress();
-                    mp.seekTo(playPositionInMillisecconds);
-                }
+                    int playPositionInMillisecconds = (MusicService.getInstance().getMediaFileLengthInMilliseconds() / 100) * seekBar.getProgress();
+                    MusicService.getInstance().seekTo(playPositionInMillisecconds);
             }
             return false;
         }
@@ -254,9 +250,9 @@ public class PlayerActivity extends BaseActivity {
         Runnable onEverySecond = new Runnable() {
             @Override
             public void run() {
-                if (mService != null) {
-                    seekBarProgress.setProgress(mService.getProgress());
-                    seekBarProgress.setSecondaryProgress(mService.getSecondaryProgress());
+                if (MusicService.getInstance() != null) {
+                    seekBarProgress.setProgress(MusicService.getInstance().getProgress());
+                    seekBarProgress.setSecondaryProgress(MusicService.getInstance().getSecondaryProgress());
                     handler.postDelayed(onEverySecond, 1000);
                 } else {
                     seekBarProgress.setProgress(0);

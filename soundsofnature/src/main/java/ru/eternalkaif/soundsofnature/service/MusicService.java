@@ -60,6 +60,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     private BroadcastReceiver broadcastReceiver;
     private static MusicService musicService;
     private boolean mPaused = false;
+    private int mediaFileLengthInMilliseconds;
 
     public MusicService() {
         musicService = this;
@@ -193,7 +194,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
         contentView.setImageViewResource(R.id.btn_pause, R.drawable.ic_play_dark);
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(123, initNotification(contentView).build());
-       // startForeground(123, initNotification(contentView).build());
+        // startForeground(123, initNotification(contentView).build());
     }
 
     public void resumePlay() {
@@ -305,7 +306,7 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
 
     public int getProgress() {
         int progress = 0;
-        if (getMp().isPlaying()) {
+        if (getMp().isPlaying() || isPaused()) {
             progress = (int) (((float) getMp().getCurrentPosition()
                     / getMp().getDuration()) * 100);
         }
@@ -366,6 +367,15 @@ public class MusicService extends Service implements MediaPlayer.OnErrorListener
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
         bufferProgress = percent;
+    }
+
+    public void seekTo(int playPositionInMillisecconds) {
+        Log.d(TAG, "Seeking to " + playPositionInMillisecconds);
+        getMp().seekTo(playPositionInMillisecconds);
+    }
+
+    public int getMediaFileLengthInMilliseconds() {
+        return getMp().getDuration();
     }
 
 
