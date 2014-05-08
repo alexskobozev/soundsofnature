@@ -118,7 +118,7 @@ public class MainActivity extends BaseActivity implements
 
         if (getServiceHelper().check(requestIntent, GetSongListCommand.class)) {
             if (resultCode == GetSongListCommand.RESPONSE_SUCCESS) {
-                Toast.makeText(this, resultData.getString("data"), Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, resultData.getString("data"), Toast.LENGTH_LONG).show();
                 dismissProgressDialog();
             } else if (resultCode == GetSongListCommand.RESPONSE_PROGRESS) {
                 updateProgressDialog(resultData.getInt(BaseCommand.EXTRA_PROGRESS, -1));
